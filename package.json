@@ -1,0 +1,16 @@
+{
+    "name": "tau",
+    "description": "Discord bot",
+    "version": "1.0.0",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/baileyherbert/studiobot"
+    },
+    "dependencies": {
+        "@types/node": "^11.9.4",
+        "chalk": "^2.4.2",
+        "cron": "^1.6.0",
+        "discord.js": "^11.4.2"
+    }
+}

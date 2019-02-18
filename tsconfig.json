@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2017",
+        "noImplicitAny": true,
+        "strict": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "strictNullChecks": true,
+        "noUnusedLocals": true,
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": false,
+        "watch": true,
+        "baseUrl": "./src/",
+        "outDir": "./dist/",
+        "types": [
+            "node"
+        ],
+        "paths": {
+            "@api": ["framework/api"],
+            "@core/*": ["framework/*"],
+            "@bot/*": ["bot/*"],
+            "@src/*": ["*"],
+            "@libraries/*": [
+                "bot/libraries/*",
+                "framework/lib/*"
+            ]
+        }
+    },
+    "compileOnSave": true
+}
