@@ -42,7 +42,7 @@ class Command {
                 text = arg.options.join('|');
             }
             if (arg.default && !arg.required) {
-                if (arg.default == '%member') {
+                if (arg.default == '@member') {
                     text += ' = you';
                 }
                 else {

@@ -24,44 +24,57 @@ class Input {
         this.command = Framework.findCommand(this.commandName);
         if (this.command) {
             let args = this.command.getArguments();
-            let remaining = this.text;
+            let remaining = this.text.trim();
             args.forEach(arg => {
-                let expression = new RegExp(this.generateExpression(arg), this.generateFlags(arg));
-                let match = expression.exec(remaining);
+                let expressions = this.generateExpressions(arg);
+                let matched = false;
                 let value = arg.default;
-                if (match) {
-                    value = match[1];
-                    remaining = remaining.substring(match.index + value.length).trim();
-                    if (typeof arg.options == 'object') {
-                        if (arg.options.indexOf(value) < 0) {
-                            this.compatible = false;
+                let supplied = (remaining.length > 0);
+                for (let i = 0; i < expressions.length; i++) {
+                    let expressionString = expressions[i];
+                    let expression = new RegExp(expressionString, this.generateFlags(arg));
+                    let match = expression.exec(remaining);
+                    if (match) {
+                        value = match[1];
+                        remaining = remaining.substring(match.index + value.length).trim();
+                        if (typeof arg.options == 'object') {
+                            if (arg.options.indexOf(value) < 0) {
+                                this.compatible = false;
+                                continue;
+                            }
+                            else {
+                                matched = true;
+                                break;
+                            }
                         }
-                    }
-                    if (this.compatible && arg.constraint) {
-                        if (arg.constraint == 'boolean') {
-                            value = value.toLowerCase();
-                            value = ['yes', '1', 'true', 'on'].indexOf(value) >= 0;
-                        }
-                        else if (arg.constraint == 'mention') {
-                            let idMatches = /<@!?(\d+)>/.exec(value);
-                            let id = idMatches[1];
-                            value = this.message.guild.members.get(id);
-                        }
-                        else if (arg.constraint == 'number') {
-                            value = (value.indexOf('.') >= 0) ? parseFloat(value) : parseInt(value);
-                        }
-                        else if (arg.constraint == 'role') {
-                            let idMatches = /<@&(\d+)>/.exec(value);
-                            let id = idMatches[1];
-                            value = this.message.guild.roles.get(id);
+                        if (this.compatible && arg.constraint) {
+                            if (arg.constraint == 'boolean') {
+                                value = value.toLowerCase();
+                                value = ['yes', '1', 'true', 'on'].indexOf(value) >= 0;
+                            }
+                            else if (arg.constraint == 'mention') {
+                                let idMatches = /<@!?(\d+)>/.exec(value);
+                                let id = idMatches[1];
+                                value = this.message.guild.members.get(id);
+                            }
+                            else if (arg.constraint == 'number') {
+                                value = (value.indexOf('.') >= 0) ? parseFloat(value) : parseInt(value);
+                            }
+                            else if (arg.constraint == 'role') {
+                                let idMatches = /<@&(\d+)>/.exec(value);
+                                let id = idMatches[1];
+                                value = this.message.guild.roles.get(id);
+                            }
+                            matched = true;
+                            break;
                         }
                     }
                 }
-                else {
-                    if (arg.required) {
+                if (!matched) {
+                    if (arg.required || (arg.error && supplied)) {
                         this.compatible = false;
                     }
-                    if (arg.default == '%member' && arg.constraint == 'mention') {
+                    if (arg.default == '@member') {
                         value = this.message.member;
                     }
                 }
@@ -96,32 +109,19 @@ class Input {
     isProper() {
         return this.compatible;
     }
-    generateExpression(arg) {
+    generateExpressions(arg) {
         if (arg.expand)
-            return '^(.+)$';
+            return ['^(.+)$'];
         if (arg.pattern) {
             let pattern = arg.pattern.toString();
             let lastSlash = pattern.lastIndexOf('/');
             pattern = pattern.substring(1, lastSlash);
-            return '^' + pattern + '(\\s|$)';
+            return ['^' + pattern + '(\\s|$)'];
         }
         if (arg.constraint) {
-            if (arg.constraint == 'number')
-                return '^(\\d+)(\\s|$)';
-            if (arg.constraint == 'alphanumeric')
-                return '^([a-zA-Z0-9._-]+)(\\s|$)';
-            if (arg.constraint == 'char')
-                return '^(.)(\\s|$)';
-            if (arg.constraint == 'mention')
-                return '^(<@!?\\d+>)(\\s|$)';
-            if (arg.constraint == 'role')
-                return '^(<@&\\d+>)(\\s|$)';
-            if (arg.constraint == 'boolean')
-                return '^(yes|no|1|0|true|false|on|off)(\\s|$)';
-            if (arg.constraint == 'emoji')
-                return '^((?:[\\u2700-\\u27bf]|(?:\\ud83c[\\udde6-\\uddff]){2}|[\\ud800-\\udbff][\\udc00-\\udfff]|[\\u0023-\\u0039]\\ufe0f?\\u20e3|\\u3299|\\u3297|\\u303d|\\u3030|\\u24c2|\\ud83c[\\udd70-\\udd71]|\\ud83c[\\udd7e-\\udd7f]|\\ud83c\\udd8e|\\ud83c[\\udd91-\\udd9a]|\\ud83c[\\udde6-\\uddff]|[\\ud83c[\\ude01-\\ude02]|\\ud83c\\ude1a|\\ud83c\\ude2f|[\\ud83c[\\ude32-\\ude3a]|[\\ud83c[\\ude50-\\ude51]|\\u203c|\\u2049|[\\u25aa-\\u25ab]|\\u25b6|\\u25c0|[\\u25fb-\\u25fe]|\\u00a9|\\u00ae|\\u2122|\\u2139|\\ud83c\\udc04|[\\u2600-\\u26FF]|\\u2b05|\\u2b06|\\u2b07|\\u2b1b|\\u2b1c|\\u2b50|\\u2b55|\\u231a|\\u231b|\\u2328|\\u23cf|[\\u23e9-\\u23f3]|[\\u23f8-\\u23fa]|\\ud83c\\udccf|\\u2934|\\u2935|[\\u2190-\\u21ff]))(\\s|$)';
+            return this.getConstraintExpressions(arg);
         }
-        return '^("[^"]+"|[^\\s"]+)(\\s|$)';
+        return ['^("[^"]+"|[^\\s"]+)(\\s|$)'];
     }
     generateFlags(arg) {
         if (arg.expand)
@@ -136,6 +136,38 @@ class Input {
             return flags;
         }
         return 'i';
+    }
+    getConstraintExpressions(arg) {
+        if (arg.constraint) {
+            if (typeof arg.constraint == 'object') {
+                let expressions = [];
+                arg.constraint.forEach((constraint) => {
+                    expressions.push(this.getConstraintExpression(constraint));
+                });
+                return expressions;
+            }
+            return [this.getConstraintExpression(arg.constraint)];
+        }
+        return [];
+    }
+    getConstraintExpression(constraint) {
+        if (constraint == 'number')
+            return '^(\\d+)(\\s|$)';
+        if (constraint == 'alphanumeric')
+            return '^([a-zA-Z0-9._-]+)(\\s|$)';
+        if (constraint == 'char')
+            return '^(.)(\\s|$)';
+        if (constraint == 'mention')
+            return '^(<@!?\\d+>)(\\s|$)';
+        if (constraint == 'role')
+            return '^(<@&\\d+>)(\\s|$)';
+        if (constraint == 'boolean')
+            return '^(yes|no|1|0|true|false|on|off)(\\s|$)';
+        if (constraint == 'url')
+            return '^((http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?)(\\\\s|$)';
+        if (constraint == 'emoji')
+            return '^((?:[\\u2700-\\u27bf]|(?:\\ud83c[\\udde6-\\uddff]){2}|[\\ud800-\\udbff][\\udc00-\\udfff]|[\\u0023-\\u0039]\\ufe0f?\\u20e3|\\u3299|\\u3297|\\u303d|\\u3030|\\u24c2|\\ud83c[\\udd70-\\udd71]|\\ud83c[\\udd7e-\\udd7f]|\\ud83c\\udd8e|\\ud83c[\\udd91-\\udd9a]|\\ud83c[\\udde6-\\uddff]|[\\ud83c[\\ude01-\\ude02]|\\ud83c\\ude1a|\\ud83c\\ude2f|[\\ud83c[\\ude32-\\ude3a]|[\\ud83c[\\ude50-\\ude51]|\\u203c|\\u2049|[\\u25aa-\\u25ab]|\\u25b6|\\u25c0|[\\u25fb-\\u25fe]|\\u00a9|\\u00ae|\\u2122|\\u2139|\\ud83c\\udc04|[\\u2600-\\u26FF]|\\u2b05|\\u2b06|\\u2b07|\\u2b1b|\\u2b1c|\\u2b50|\\u2b55|\\u231a|\\u231b|\\u2328|\\u23cf|[\\u23e9-\\u23f3]|[\\u23f8-\\u23fa]|\\ud83c\\udccf|\\u2934|\\u2935|[\\u2190-\\u21ff]))(\\s|$)';
+        return '^("[^"]+"|[^\\s"]+)(\\s|$)';
     }
 }
 exports.Input = Input;

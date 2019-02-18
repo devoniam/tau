@@ -83,7 +83,7 @@ export abstract class Command {
             }
 
             if (arg.default && !arg.required) {
-                if (arg.default == '%member') {
+                if (arg.default == '@member') {
                     text += ' = you';
                 }
                 else {
@@ -145,7 +145,7 @@ type CommandArgument = {
 
     /**
      * A constraint for the argument. This essentially changes the pattern to fit the constraint, but also
-     * will make the argument return a matching data type.
+     * will make the argument return a matching data type. Use an array to accept multiple types in one argument.
      *
      * - `number` - decimals and integers
      * - `alphanumeric` - letters, numbers, periods, underscores, dashes
@@ -155,7 +155,7 @@ type CommandArgument = {
      * - `role` - a mention of a role, returns a `Role`
      * - `boolean` - one of `yes|no|true|false|1|0|on|off`, returns a `boolean`
      */
-    constraint?: 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean';
+    constraint?: CommandConstraint | CommandConstraint[];
 
     /**
      * An enumeration of possible values this argument can be. If the user specifies a value not in this
@@ -166,7 +166,7 @@ type CommandArgument = {
     /**
      * The default value of this argument.
      *
-     * - For a `mention` constraint, you can set this as `'%member'` to default to the calling guild member.
+     * - For a `mention` constraint, you can set this as `'@member'` to default to the calling guild member.
      */
     default?: string | number | null | GuildMember | Role | boolean | undefined;
 
@@ -177,4 +177,12 @@ type CommandArgument = {
      * **Note**  —  This overrides the pattern to `^(.+)$`
      */
     expand?: boolean;
+
+    /**
+     * If the argument is optional, this option is set to `true`, and the user provides a value which does not match
+     * the argument's constraints, pattern, or options, then the command will be rejected.
+     */
+    error?: boolean;
 };
+
+type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';

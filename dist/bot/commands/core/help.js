@@ -11,7 +11,8 @@ class Help extends _api_1.Command {
                     name: 'destination',
                     description: 'Where to post the help commands.',
                     options: ['here', 'dm'],
-                    default: 'dm'
+                    default: 'dm',
+                    error: true
                 }
             ]
         });
