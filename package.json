@@ -11,6 +11,7 @@
         "@types/node": "^11.9.4",
         "chalk": "^2.4.2",
         "cron": "^1.6.0",
-        "discord.js": "^11.4.2"
+        "discord.js": "^11.4.2",
+        "typescript": "^3.3.3"
     }
 }
