@@ -25,7 +25,10 @@
                 "bot/libraries/*",
                 "framework/lib/*"
             ]
-        }
+        },
     },
-    "compileOnSave": true
+    "compileOnSave": true,
+    "exclude": [
+        "test"
+    ]
 }
