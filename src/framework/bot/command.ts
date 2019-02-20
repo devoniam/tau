@@ -79,6 +79,10 @@ export abstract class Command {
             let text = arg.usage ? arg.usage : arg.name;
 
             if (!arg.usage) {
+                if (!arg.options && arg.expand && !arg.default) {
+                    text += '...';
+                }
+
                 if (arg.options) {
                     text = arg.options.join('|');
                 }
@@ -195,13 +199,13 @@ type CommandArgument = {
 
     /**
      * A lambda function which will be called to evaluate the input during parsing. The `input` is passed in the first
-     * parameter as a string, and you should return a bool back (`true` if the value is valid).
+     * parameter as a parsed value, and you should return a bool back (`true` if the value is valid).
      *
      * **Note:** This function only gets called if the value matches the constraints, patterns, and options specified in
      * your argument. So if you lock those down properly, you should know exactly what format the value of `input` will
      * be in and can trust it to be so.
      */
-    eval?: (input: string) => boolean;
+    eval?: (input: any) => boolean;
 };
 
 type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';

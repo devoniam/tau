@@ -39,6 +39,9 @@ class Command {
         this.getArguments().forEach(arg => {
             let text = arg.usage ? arg.usage : arg.name;
             if (!arg.usage) {
+                if (!arg.options && arg.expand && !arg.default) {
+                    text += '...';
+                }
                 if (arg.options) {
                     text = arg.options.join('|');
                 }
