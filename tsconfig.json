@@ -9,7 +9,7 @@
         "strictNullChecks": true,
         "noUnusedLocals": false,
         "forceConsistentCasingInFileNames": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "watch": true,
         "baseUrl": "./src/",
         "outDir": "./dist/",
@@ -25,7 +25,7 @@
                 "bot/libraries/*",
                 "framework/lib/*"
             ]
-        },
+        }
     },
     "compileOnSave": true,
     "exclude": [

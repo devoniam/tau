@@ -23,3 +23,4 @@ class Prefix extends _api_1.Command {
     }
 }
 exports.Prefix = Prefix;
+//# sourceMappingURL=prefix.js.map

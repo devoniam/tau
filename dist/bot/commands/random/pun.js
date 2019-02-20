@@ -13,3 +13,4 @@ class Pun extends _api_1.Command {
     }
 }
 exports.Pun = Pun;
+//# sourceMappingURL=pun.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"example-job.js","sourceRoot":"","sources":["../../../src/bot/jobs/example-job.ts"],"names":[],"mappings":";;AAAA,+BAA2B;AAE3B,MAAa,UAAW,SAAQ,UAAG;IAE/B;QACI,KAAK,CAAC;YACF,IAAI,EAAE,SAAS;YACf,IAAI,EAAE,aAAa;SACtB,CAAC,CAAC;IACP,CAAC;IAED,OAAO;IAGP,CAAC;CACJ;AAbD,gCAaC"}

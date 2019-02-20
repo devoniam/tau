@@ -23,3 +23,4 @@ class Roll extends _api_1.Command {
     }
 }
 exports.Roll = Roll;
+//# sourceMappingURL=roll.js.map

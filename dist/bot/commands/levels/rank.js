@@ -22,3 +22,4 @@ class Rank extends _api_1.Command {
     }
 }
 exports.Rank = Rank;
+//# sourceMappingURL=rank.js.map

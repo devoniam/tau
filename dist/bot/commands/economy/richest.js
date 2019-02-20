@@ -24,3 +24,4 @@ class Richest extends _api_1.Command {
     }
 }
 exports.Richest = Richest;
+//# sourceMappingURL=richest.js.map

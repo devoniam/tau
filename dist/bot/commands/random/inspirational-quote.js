@@ -14,3 +14,4 @@ class InspirationalQuote extends _api_1.Command {
     }
 }
 exports.InspirationalQuote = InspirationalQuote;
+//# sourceMappingURL=inspirational-quote.js.map

@@ -32,3 +32,4 @@ class User extends _api_1.Command {
     }
 }
 exports.User = User;
+//# sourceMappingURL=user.js.map

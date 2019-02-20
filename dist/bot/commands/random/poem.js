@@ -13,3 +13,4 @@ class Poem extends _api_1.Command {
     }
 }
 exports.Poem = Poem;
+//# sourceMappingURL=poem.js.map

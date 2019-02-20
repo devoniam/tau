@@ -22,3 +22,4 @@ class Avatar extends _api_1.Command {
     }
 }
 exports.Avatar = Avatar;
+//# sourceMappingURL=avatar.js.map

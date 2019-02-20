@@ -25,3 +25,4 @@ class Leaderboard extends _api_1.Command {
     }
 }
 exports.Leaderboard = Leaderboard;
+//# sourceMappingURL=leaderboard.js.map

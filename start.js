@@ -1,6 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 
+try { require('source-map-support').install(); }
+catch (err) {}
+
 const BuiltinModule = require('module');
 const Module = module.constructor.length > 1 ? module.constructor : BuiltinModule;
 const Resolve = Module._resolveFilename;

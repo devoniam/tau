@@ -31,3 +31,4 @@ class Quote extends _api_1.Command {
     }
 }
 exports.Quote = Quote;
+//# sourceMappingURL=quote.js.map

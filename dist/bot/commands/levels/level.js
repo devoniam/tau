@@ -22,3 +22,4 @@ class Level extends _api_1.Command {
     }
 }
 exports.Level = Level;
+//# sourceMappingURL=level.js.map

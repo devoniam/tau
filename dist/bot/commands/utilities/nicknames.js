@@ -22,3 +22,4 @@ class Nicknames extends _api_1.Command {
     }
 }
 exports.Nicknames = Nicknames;
+//# sourceMappingURL=nicknames.js.map

@@ -17,3 +17,4 @@ class Bucket {
     }
 }
 exports.Bucket = Bucket;
+//# sourceMappingURL=bucket.js.map

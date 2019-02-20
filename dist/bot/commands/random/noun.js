@@ -13,3 +13,4 @@ class Noun extends _api_1.Command {
     }
 }
 exports.Noun = Noun;
+//# sourceMappingURL=noun.js.map

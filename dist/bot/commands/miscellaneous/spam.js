@@ -38,3 +38,4 @@ class Spam extends _api_1.Command {
     }
 }
 exports.Spam = Spam;
+//# sourceMappingURL=spam.js.map

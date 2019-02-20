@@ -13,3 +13,4 @@ class Ping extends _api_1.Command {
     }
 }
 exports.Ping = Ping;
+//# sourceMappingURL=ping.js.map

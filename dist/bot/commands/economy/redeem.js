@@ -14,3 +14,4 @@ class Redeem extends _api_1.Command {
     }
 }
 exports.Redeem = Redeem;
+//# sourceMappingURL=redeem.js.map

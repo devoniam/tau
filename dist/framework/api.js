@@ -10,3 +10,4 @@ var job_1 = require("./bot/job");
 exports.Job = job_1.Job;
 var database_1 = require("./lib/database");
 exports.Database = database_1.Database;
+//# sourceMappingURL=api.js.map

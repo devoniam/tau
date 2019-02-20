@@ -23,3 +23,4 @@ class Balance extends _api_1.Command {
     }
 }
 exports.Balance = Balance;
+//# sourceMappingURL=balance.js.map

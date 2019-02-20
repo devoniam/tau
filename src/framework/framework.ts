@@ -266,7 +266,7 @@ export class Framework {
             if (fs.statSync(dir + '/' + file).isDirectory()) {
                 found = this.getFilesSync(dir + '/' + file, found);
             }
-            else {
+            else if (file.toLowerCase().endsWith('.js')) {
                 found.push(path.resolve(dir + '/' + file));
             }
         });

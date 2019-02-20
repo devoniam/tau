@@ -22,3 +22,4 @@ class EightBall extends _api_1.Command {
     }
 }
 exports.EightBall = EightBall;
+//# sourceMappingURL=eightball.js.map

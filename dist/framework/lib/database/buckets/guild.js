@@ -15,3 +15,4 @@ class GuildBucket extends bucket_1.Bucket {
     }
 }
 exports.GuildBucket = GuildBucket;
+//# sourceMappingURL=guild.js.map

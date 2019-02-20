@@ -13,3 +13,4 @@ class Verb extends _api_1.Command {
     }
 }
 exports.Verb = Verb;
+//# sourceMappingURL=verb.js.map

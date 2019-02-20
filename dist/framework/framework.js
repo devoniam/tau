@@ -179,7 +179,7 @@ class Framework {
             if (fs.statSync(dir + '/' + file).isDirectory()) {
                 found = this.getFilesSync(dir + '/' + file, found);
             }
-            else {
+            else if (file.toLowerCase().endsWith('.js')) {
                 found.push(path.resolve(dir + '/' + file));
             }
         });
@@ -225,3 +225,4 @@ class Framework {
 }
 Framework.commands = [];
 exports.Framework = Framework;
+//# sourceMappingURL=framework.js.map

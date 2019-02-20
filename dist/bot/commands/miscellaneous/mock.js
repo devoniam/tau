@@ -23,3 +23,4 @@ class Mock extends _api_1.Command {
     }
 }
 exports.Mock = Mock;
+//# sourceMappingURL=mock.js.map

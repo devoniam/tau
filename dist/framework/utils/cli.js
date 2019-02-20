@@ -18,3 +18,4 @@ class CommandLine {
 }
 CommandLine.cachedFlags = {};
 exports.CommandLine = CommandLine;
+//# sourceMappingURL=cli.js.map

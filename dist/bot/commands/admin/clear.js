@@ -24,3 +24,4 @@ class Clear extends _api_1.Command {
     }
 }
 exports.Clear = Clear;
+//# sourceMappingURL=clear.js.map

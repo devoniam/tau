@@ -13,3 +13,4 @@ class Uptime extends _api_1.Command {
     }
 }
 exports.Uptime = Uptime;
+//# sourceMappingURL=uptime.js.map

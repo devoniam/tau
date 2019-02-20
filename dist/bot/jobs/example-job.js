@@ -12,3 +12,4 @@ class ExampleJob extends _api_1.Job {
     }
 }
 exports.ExampleJob = ExampleJob;
+//# sourceMappingURL=example-job.js.map

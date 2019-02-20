@@ -30,3 +30,4 @@ class Music extends _api_1.Command {
     }
 }
 exports.Music = Music;
+//# sourceMappingURL=music.js.map

@@ -22,3 +22,4 @@ class Match extends _api_1.Command {
     }
 }
 exports.Match = Match;
+//# sourceMappingURL=match.js.map

@@ -10,3 +10,4 @@ class MemberBucket extends bucket_1.Bucket {
     }
 }
 exports.MemberBucket = MemberBucket;
+//# sourceMappingURL=member.js.map

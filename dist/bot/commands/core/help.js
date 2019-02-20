@@ -21,3 +21,4 @@ class Help extends _api_1.Command {
     }
 }
 exports.Help = Help;
+//# sourceMappingURL=help.js.map
