@@ -37,16 +37,18 @@ class Command {
         let usage = this.getName();
         let args = [];
         this.getArguments().forEach(arg => {
-            let text = arg.name;
-            if (arg.options) {
-                text = arg.options.join('|');
-            }
-            if (arg.default && !arg.required) {
-                if (arg.default == '@member') {
-                    text += ' = you';
+            let text = arg.usage ? arg.usage : arg.name;
+            if (!arg.usage) {
+                if (arg.options) {
+                    text = arg.options.join('|');
                 }
-                else {
-                    text += ' = ' + arg.default;
+                if (arg.default && !arg.required) {
+                    if (arg.default == '@member') {
+                        text += ' = you';
+                    }
+                    else {
+                        text += ' = ' + arg.default;
+                    }
                 }
             }
             if (arg.required)

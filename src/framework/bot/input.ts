@@ -63,6 +63,14 @@ export class Input {
                         value = match[1];
                         remaining = remaining.substring(match.index + value.length).trim();
 
+                        let passesEval = () => {
+                            if (typeof arg.eval == 'function') {
+                                return arg.eval(value);
+                            }
+
+                            return true;
+                        };
+
                         if (typeof arg.options == 'object') {
                             if (arg.options.indexOf(value as any) < 0) {
                                 this.compatible = false;
@@ -93,8 +101,16 @@ export class Input {
                                 value = this.message.guild.roles.get(id);
                             }
 
-                            matched = true;
-                            break;
+                            if (passesEval()) {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        else if (this.compatible) {
+                            if (passesEval()) {
+                                matched = true;
+                                break;
+                            }
                         }
                     }
                 }

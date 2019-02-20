@@ -76,18 +76,20 @@ export abstract class Command {
         let args : string[] = [];
 
         this.getArguments().forEach(arg => {
-            let text = arg.name;
+            let text = arg.usage ? arg.usage : arg.name;
 
-            if (arg.options) {
-                text = arg.options.join('|');
-            }
-
-            if (arg.default && !arg.required) {
-                if (arg.default == '@member') {
-                    text += ' = you';
+            if (!arg.usage) {
+                if (arg.options) {
+                    text = arg.options.join('|');
                 }
-                else {
-                    text += ' = ' + arg.default;
+
+                if (arg.default && !arg.required) {
+                    if (arg.default == '@member') {
+                        text += ' = you';
+                    }
+                    else {
+                        text += ' = ' + arg.default;
+                    }
                 }
             }
 
@@ -183,6 +185,23 @@ type CommandArgument = {
      * the argument's constraints, pattern, or options, then the command will be rejected.
      */
     error?: boolean;
+
+    /**
+     * Usage information for the argument, such as 'amount' or 'amount|all'. If not set explicitly, this will be
+     * generated automatically from the argument's configuration. Note that the usage string will be surrounded by
+     * either '<>' or '[]' to display whether it is required or not.
+     */
+    usage?: string;
+
+    /**
+     * A lambda function which will be called to evaluate the input during parsing. The `input` is passed in the first
+     * parameter as a string, and you should return a bool back (`true` if the value is valid).
+     *
+     * **Note:** This function only gets called if the value matches the constraints, patterns, and options specified in
+     * your argument. So if you lock those down properly, you should know exactly what format the value of `input` will
+     * be in and can trust it to be so.
+     */
+    eval?: (input: string) => boolean;
 };
 
 type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';
