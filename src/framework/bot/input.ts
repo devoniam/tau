@@ -49,6 +49,10 @@ export class Input {
             let remaining = this.text.trim();
 
             args.forEach(arg => {
+                if (!this.compatible) {
+                    return;
+                }
+
                 let expressions = this.generateExpressions(arg);
                 let matched = false;
                 let value : any = arg.default;
@@ -61,7 +65,6 @@ export class Input {
 
                     if (match) {
                         value = match[1];
-                        remaining = remaining.substring(match.index + value.length).trim();
 
                         let passesEval = () => {
                             if (typeof arg.eval == 'function') {
@@ -73,10 +76,10 @@ export class Input {
 
                         if (typeof arg.options == 'object') {
                             if (arg.options.indexOf(value as any) < 0) {
-                                this.compatible = false;
                                 continue;
                             }
                             else {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
@@ -102,12 +105,14 @@ export class Input {
                             }
 
                             if (passesEval()) {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
                         }
                         else if (this.compatible) {
                             if (passesEval()) {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
@@ -127,7 +132,7 @@ export class Input {
 
                 this.args.push({
                     name: arg.name,
-                    value: value
+                    value: (matched) ? value : undefined
                 });
             });
         }

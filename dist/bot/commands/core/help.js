@@ -5,21 +5,19 @@ class Help extends _api_1.Command {
     constructor() {
         super({
             name: 'help',
-            description: 'Shows a list of commands.',
+            description: 'Returns a list of commands.',
             arguments: [
                 {
-                    name: 'destination',
-                    description: 'Where to post the help commands.',
-                    options: ['here', 'dm'],
-                    default: 'dm',
-                    error: true
+                    name: 'name',
+                    description: 'The name of the command to see more details about.'
                 }
             ]
         });
     }
     execute(input) {
-        let destination = input.getArgument('destination');
-        input.channel.send('List commands ' + (destination == 'here' ? 'here' : 'in a message') + '...');
+        let name = input.getArgument('name');
+        if (name) {
+        }
     }
 }
 exports.Help = Help;

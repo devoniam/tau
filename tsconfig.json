@@ -7,7 +7,7 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "strictNullChecks": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "forceConsistentCasingInFileNames": true,
         "sourceMap": false,
         "watch": true,

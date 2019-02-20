@@ -206,6 +206,12 @@ type CommandArgument = {
      * be in and can trust it to be so.
      */
     eval?: (input: any) => boolean;
+
+    /**
+     * The message to display if this argument fails. If not specified, the command's usage string will be displayed.
+     * This only applies to arguments that are `required` or have `error` enabled.
+     */
+    message?: string;
 };
 
 type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';

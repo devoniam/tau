@@ -26,6 +26,9 @@ class Input {
             let args = this.command.getArguments();
             let remaining = this.text.trim();
             args.forEach(arg => {
+                if (!this.compatible) {
+                    return;
+                }
                 let expressions = this.generateExpressions(arg);
                 let matched = false;
                 let value = arg.default;
@@ -36,7 +39,6 @@ class Input {
                     let match = expression.exec(remaining);
                     if (match) {
                         value = match[1];
-                        remaining = remaining.substring(match.index + value.length).trim();
                         let passesEval = () => {
                             if (typeof arg.eval == 'function') {
                                 return arg.eval(value);
@@ -45,10 +47,10 @@ class Input {
                         };
                         if (typeof arg.options == 'object') {
                             if (arg.options.indexOf(value) < 0) {
-                                this.compatible = false;
                                 continue;
                             }
                             else {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
@@ -72,12 +74,14 @@ class Input {
                                 value = this.message.guild.roles.get(id);
                             }
                             if (passesEval()) {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
                         }
                         else if (this.compatible) {
                             if (passesEval()) {
+                                remaining = remaining.substring(match.index + value.length).trim();
                                 matched = true;
                                 break;
                             }
@@ -94,7 +98,7 @@ class Input {
                 }
                 this.args.push({
                     name: arg.name,
-                    value: value
+                    value: (matched) ? value : undefined
                 });
             });
         }
