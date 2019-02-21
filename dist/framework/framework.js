@@ -92,12 +92,17 @@ class Framework {
             });
         }
         process.on('SIGINT', () => {
-            this.logger.info('Stopping gracefully...');
-            this.logger.verbose('Waiting for client to sign off...');
-            this.client.destroy().then(() => {
-                this.logger.verbose('All done, sayonara!');
+            if (!cli_1.CommandLine.hasFlag('dry')) {
+                this.logger.info('Stopping gracefully...');
+                this.logger.verbose('Waiting for client to sign off...');
+                this.client.destroy().then(() => {
+                    this.logger.verbose('All done, sayonara!');
+                    process.exit();
+                });
+            }
+            else {
                 process.exit();
-            });
+            }
         });
     }
     static loadCommands(inDirectory) {
