@@ -14,10 +14,12 @@
         "chalk": "^2.4.2",
         "cron": "^1.6.0",
         "discord.js": "^11.4.2",
+        "lodash": "^4.17.11",
         "typescript": "^3.3.3"
     },
     "devDependencies": {
         "@types/chai": "^4.1.7",
+        "@types/lodash": "^4.14.121",
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.9.4",
         "chai": "^4.2.0",

@@ -1,9 +1,14 @@
 const path = require('path');
 const fs = require('fs');
 
+// Add lodash as a global variable (see /src/framework/types/global.d.ts)
+global._ = require('lodash');
+
+// Add typescript sourcemapping for stack traces
 try { require('source-map-support').install(); }
 catch (err) {}
 
+// Add support for typescript path mapping
 const BuiltinModule = require('module');
 const Module = module.constructor.length > 1 ? module.constructor : BuiltinModule;
 const Resolve = Module._resolveFilename;

@@ -12,6 +12,7 @@ const job_1 = require("./bot/job");
 const member_1 = require("./lib/database/buckets/member");
 const guild_1 = require("./lib/database/buckets/guild");
 const input_1 = require("./bot/input");
+const emoji_1 = require("@bot/libraries/emoji");
 class Framework {
     static start() {
         this.logger = new logger_1.Logger();
@@ -220,7 +221,18 @@ class Framework {
                     command.execute(input);
                 }
                 else {
-                    message.channel.send('Usage:  `' + command.getUsage() + '`');
+                    let error = input.getError();
+                    if (error) {
+                        if (error.message.endsWith('.')) {
+                            error.message = error.message.substring(0, error.message.length - 1) + ':';
+                        }
+                    }
+                    if (error && (!error.message.startsWith('Please enter a') || error.message.startsWith('Please enter a valid'))) {
+                        message.channel.send(`${emoji_1.Emoji.ERROR}  ${error.message}  \`${command.getUsage()}\``);
+                    }
+                    else {
+                        message.channel.send(`${emoji_1.Emoji.HELP}  Usage:  \`${command.getUsage()}\``);
+                    }
                 }
             }
         });

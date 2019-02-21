@@ -1,14 +1,24 @@
 import { GuildMember, Role } from 'discord.js';
 import { Input } from '@core/api';
 import { Logger } from './logger';
+import { Argument } from '@core/internal/argument';
 
 export abstract class Command {
     private logger: Logger;
     private options: CommandOptions;
+    private arguments: Argument[];
 
     constructor(options: CommandOptions) {
         this.options = options;
         this.logger = new Logger('command:' + this.options.name);
+        this.arguments = [];
+
+        // Convert the arguments option to an array of argument objects
+        if (this.options.arguments) {
+            _.forEach(this.options.arguments, argument => {
+                this.arguments.push(new Argument(argument));
+            });
+        }
     }
 
     /**
@@ -64,8 +74,8 @@ export abstract class Command {
     /**
      * Returns an array of the command's arguments.
      */
-    public getArguments(): CommandArgument[] {
-        return this.options.arguments || [];
+    public getArguments(): Argument[] {
+        return this.arguments;
     }
 
     /**
@@ -76,36 +86,14 @@ export abstract class Command {
         let args : string[] = [];
 
         this.getArguments().forEach(arg => {
-            let text = arg.usage ? arg.usage : arg.name;
-
-            if (!arg.usage) {
-                if (!arg.options && arg.expand && !arg.default) {
-                    text += '...';
-                }
-
-                if (arg.options) {
-                    text = arg.options.join('|');
-                }
-
-                if (arg.default && !arg.required) {
-                    if (arg.default == '@member') {
-                        text += ' = you';
-                    }
-                    else {
-                        text += ' = ' + arg.default;
-                    }
-                }
-            }
-
-            if (arg.required) args.push('<' + text + '>');
-            else args.push('[' + text + ']');
+            args.push(arg.getUsage());
         });
 
         return `${usage} ${args.join(' ')}`.trim();
     }
 }
 
-type CommandOptions = {
+export type CommandOptions = {
     /**
      * The name of the command, which is used by users to call it.
      */
@@ -127,7 +115,7 @@ type CommandOptions = {
     arguments?: CommandArgument[];
 };
 
-type CommandArgument = {
+export type CommandArgument = {
     /**
      * The name of the argument, which will be used by you to retrieve its value.
      */
@@ -147,7 +135,15 @@ type CommandArgument = {
      * A custom regular expression to match this argument (default is `("[^"]+"|[^\\s"]+)` but this varies depending
      * on whether you've set a `constraint`).
      */
-    pattern?: RegExp;
+    patterns?: RegExp | RegExp[];
+
+    /**
+     * A custom regular expression to match this argument (default is `("[^"]+"|[^\\s"]+)` but this varies depending
+     * on whether you've set a `constraint`).
+     *
+     * @alias `patterns`
+     */
+    pattern?: RegExp | RegExp[];
 
     /**
      * A constraint for the argument. This essentially changes the pattern to fit the constraint, but also
@@ -204,6 +200,9 @@ type CommandArgument = {
      * **Note:** This function only gets called if the value matches the constraints, patterns, and options specified in
      * your argument. So if you lock those down properly, you should know exactly what format the value of `input` will
      * be in and can trust it to be so.
+     *
+     * **Note #2:** You can throw an `Error` from this function and the bot will respond with the error's message. This
+     * can help provide contextual feedback to the user when giving an incorrect value.
      */
     eval?: (input: any) => boolean;
 
@@ -214,4 +213,4 @@ type CommandArgument = {
     message?: string;
 };
 
-type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';
+export type CommandConstraint = 'number' | 'string' | 'alphanumeric' | 'char' | 'mention' | 'emoji' | 'role' | 'boolean' | 'url';

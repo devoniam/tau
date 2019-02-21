@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const parser_1 = require("@core/internal/parser");
 class Input {
     constructor(message) {
-        this.command = null;
         this.prefix = '';
         this.commandName = '';
         this.text = '';
@@ -21,93 +21,26 @@ class Input {
         this.commandName = content.substring(0, space);
         this.text = content.substring(space).trim();
         let { Framework } = require('../framework');
-        this.command = Framework.findCommand(this.commandName);
-        if (this.command) {
-            let args = this.command.getArguments();
-            let remaining = this.text.trim();
-            args.forEach(arg => {
-                if (!this.compatible) {
-                    return;
-                }
-                let expressions = this.generateExpressions(arg);
-                let matched = false;
-                let value = arg.default;
-                let supplied = (remaining.length > 0);
-                for (let i = 0; i < expressions.length; i++) {
-                    let expressionString = expressions[i];
-                    let expression = new RegExp(expressionString, this.generateFlags(arg));
-                    let match = expression.exec(remaining);
-                    if (match) {
-                        value = match[1];
-                        let passesEval = () => {
-                            if (typeof arg.eval == 'function') {
-                                return arg.eval(value);
-                            }
-                            return true;
-                        };
-                        if (typeof arg.options == 'object') {
-                            if (arg.options.indexOf(value) < 0) {
-                                continue;
-                            }
-                            else {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-                        if (this.compatible && arg.constraint) {
-                            if (arg.constraint == 'boolean') {
-                                value = value.toLowerCase();
-                                value = ['yes', '1', 'true', 'on'].indexOf(value) >= 0;
-                            }
-                            else if (arg.constraint == 'mention') {
-                                let idMatches = /<@!?(\d+)>/.exec(value);
-                                let id = idMatches[1];
-                                value = this.message.guild.members.get(id);
-                            }
-                            else if (arg.constraint == 'number') {
-                                value = (value.indexOf('.') >= 0) ? parseFloat(value) : parseInt(value);
-                            }
-                            else if (arg.constraint == 'role') {
-                                let idMatches = /<@&(\d+)>/.exec(value);
-                                let id = idMatches[1];
-                                value = this.message.guild.roles.get(id);
-                            }
-                            if (passesEval()) {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-                        else if (this.compatible) {
-                            if (passesEval()) {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!matched) {
-                    if (arg.required || (arg.error && supplied)) {
-                        this.compatible = false;
-                    }
-                    if (arg.default == '@member') {
-                        value = this.message.member;
-                    }
-                }
-                this.args.push({
-                    name: arg.name,
-                    value: (matched) ? value : undefined
-                });
+        if (!(this.command = Framework.findCommand(this.commandName)))
+            return;
+        let parser = new parser_1.Parser(this.command, this.message, this.text);
+        this.error = parser.getError();
+        this.compatible = (this.error == undefined);
+        _.forEach(parser.getArguments(), parsed => {
+            this.args.push({
+                name: parsed.name,
+                value: parsed.parsedValue
             });
-        }
+        });
     }
     getCommandName() {
         return this.commandName;
     }
     getCommand() {
         return this.command;
+    }
+    getError() {
+        return this.error;
     }
     getPrefix() {
         return this.prefix;

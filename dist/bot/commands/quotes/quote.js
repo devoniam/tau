@@ -9,7 +9,7 @@ class Quote extends _api_1.Command {
             arguments: [
                 {
                     name: 'action',
-                    usage: 'add|remove|get',
+                    options: ['add', 'remove', 'get'],
                     default: 'get'
                 },
                 {
@@ -23,10 +23,6 @@ class Quote extends _api_1.Command {
     execute(input) {
         let action = input.getArgument('action');
         let user = input.getArgument('user');
-        if (typeof action != 'string') {
-            user = action;
-            action = 'get';
-        }
         input.channel.send('Not yet implemented.');
     }
 }

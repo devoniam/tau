@@ -12,6 +12,7 @@ import { Job } from './bot/job';
 import { MemberBucket } from './lib/database/buckets/member';
 import { GuildBucket } from './lib/database/buckets/guild';
 import { Input } from './bot/input';
+import { Emoji } from '@bot/libraries/emoji';
 
 export class Framework {
     private static config: BotConfiguration;
@@ -29,28 +30,37 @@ export class Framework {
         this.loadConfiguration();
         this.bindGracefulShutdown();
 
-        // Start the client
-        this.logger.info('Logging in...');
-        this.client = new Client();
-        this.client.login(this.config.authentication.discord.token);
+        if (!CommandLine.hasFlag('dry')) {
+            // Start the client
+            this.logger.info('Logging in...');
+            this.client = new Client();
+            this.client.login(this.config.authentication.discord.token);
 
-        // Wait for ready
-        this.client.on('ready', () => {
-            this.logger.clear();
-            this.logger.info('Logged in as %s.', this.client.user.tag);
-            this.logger.debug('Logged in with Client Id: %s', this.client.user.id);
-            this.logger.verbose('This client is a %s.', this.client.user.bot ? 'bot' : 'user');
-            this.logger.verbose('Found %d channels across %d guilds.', this.client.channels.size, this.client.guilds.size);
-            this.logger.debug('Loading components...');
+            // Wait for ready
+            this.client.on('ready', () => {
+                this.logger.clear();
+                this.logger.info('Logged in as %s.', this.client.user.tag);
+                this.logger.debug('Logged in with Client Id: %s', this.client.user.id);
+                this.logger.verbose('This client is a %s.', this.client.user.bot ? 'bot' : 'user');
+                this.logger.verbose('Found %d channels across %d guilds.', this.client.channels.size, this.client.guilds.size);
+                this.logger.debug('Loading components...');
+
+                this.loadCommands();
+                this.loadListeners();
+                this.loadScripts();
+                this.loadJobs();
+                this.listen();
+
+                this.logger.debug('Bot is online...');
+            });
+        }
+        else {
+            // Do a dry run - no client
 
             this.loadCommands();
-            this.loadListeners();
             this.loadScripts();
             this.loadJobs();
-            this.listen();
-
-            this.logger.debug('Bot is online...');
-        });
+        }
     }
 
     /**
@@ -132,13 +142,18 @@ export class Framework {
         }
 
         process.on('SIGINT', () => {
-            this.logger.info('Stopping gracefully...');
-            this.logger.verbose('Waiting for client to sign off...');
+            if (!CommandLine.hasFlag('dry')) {
+                this.logger.info('Stopping gracefully...');
+                this.logger.verbose('Waiting for client to sign off...');
 
-            this.client.destroy().then(() => {
-                this.logger.verbose('All done, sayonara!');
+                this.client.destroy().then(() => {
+                    this.logger.verbose('All done, sayonara!');
+                    process.exit();
+                });
+            }
+            else {
                 process.exit();
-            });
+            }
         });
     }
 
@@ -311,7 +326,20 @@ export class Framework {
                     command.execute(input);
                 }
                 else {
-                    message.channel.send('Usage:  `' + command.getUsage() + '`');
+                    let error = input.getError();
+
+                    if (error) {
+                        if (error.message.endsWith('.')) {
+                            error.message = error.message.substring(0, error.message.length - 1) + ':';
+                        }
+                    }
+
+                    if (error && (!error.message.startsWith('Please enter a') || error.message.startsWith('Please enter a valid'))) {
+                        message.channel.send(`${Emoji.ERROR}  ${error.message}  \`${command.getUsage()}\``);
+                    }
+                    else {
+                        message.channel.send(`${Emoji.HELP}  Usage:  \`${command.getUsage()}\``);
+                    }
                 }
             }
         });

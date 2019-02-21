@@ -1,5 +1,6 @@
 import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
 import { Command } from './command';
+import { Parser } from '@core/internal/parser';
 
 export class Input {
 
@@ -8,12 +9,14 @@ export class Input {
     public guild: Guild;
     public channel: TextChannel | DMChannel | GroupDMChannel;
 
-    private command: Command|null = null;
+    private command?: Command;
     private prefix: string = '';
     private commandName: string = '';
     private text: string = '';
     private args: Argument[] = [];
     private compatible: boolean = true;
+
+    private error: Error|undefined;
 
     constructor(message: Message) {
         // Extract basic message properties
@@ -41,128 +44,56 @@ export class Input {
 
         // Find a matching command
         let { Framework } = require('../framework');
-        this.command = Framework.findCommand(this.commandName);
+        if (!(this.command = Framework.findCommand(this.commandName))) return;
 
-        // Build arguments
-        if (this.command) {
-            let args = this.command.getArguments();
-            let remaining = this.text.trim();
+        // Create the parser
+        let parser = new Parser(this.command as Command, this.message, this.text);
 
-            args.forEach(arg => {
-                if (!this.compatible) {
-                    return;
-                }
+        // Check for errors
+        this.error = parser.getError();
+        this.compatible = (this.error == undefined);
 
-                let expressions = this.generateExpressions(arg);
-                let matched = false;
-                let value : any = arg.default;
-                let supplied = (remaining.length > 0);
-
-                for (let i = 0; i < expressions.length; i++) {
-                    let expressionString = expressions[i];
-                    let expression = new RegExp(expressionString, this.generateFlags(arg));
-                    let match = expression.exec(remaining);
-
-                    if (match) {
-                        value = match[1];
-
-                        let passesEval = () => {
-                            if (typeof arg.eval == 'function') {
-                                return arg.eval(value);
-                            }
-
-                            return true;
-                        };
-
-                        if (typeof arg.options == 'object') {
-                            if (arg.options.indexOf(value as any) < 0) {
-                                continue;
-                            }
-                            else {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-
-                        if (this.compatible && arg.constraint) {
-                            if (arg.constraint == 'boolean') {
-                                value = value.toLowerCase();
-                                value = ['yes', '1', 'true', 'on'].indexOf(value) >= 0;
-                            }
-                            else if (arg.constraint == 'mention') {
-                                let idMatches = /<@!?(\d+)>/.exec(value) as RegExpExecArray;
-                                let id = idMatches[1];
-                                value = this.message.guild.members.get(id);
-                            }
-                            else if (arg.constraint == 'number') {
-                                value = (value.indexOf('.') >= 0) ? parseFloat(value) : parseInt(value);
-                            }
-                            else if (arg.constraint == 'role') {
-                                let idMatches = /<@&(\d+)>/.exec(value) as RegExpExecArray;
-                                let id = idMatches[1];
-                                value = this.message.guild.roles.get(id);
-                            }
-
-                            if (passesEval()) {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-                        else if (this.compatible) {
-                            if (passesEval()) {
-                                remaining = remaining.substring(match.index + value.length).trim();
-                                matched = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (!matched) {
-                    if (arg.required || (arg.error && supplied)) {
-                        this.compatible = false;
-                    }
-
-                    if (arg.default == '@member') {
-                        value = this.message.member;
-                    }
-                }
-
-                this.args.push({
-                    name: arg.name,
-                    value: (matched) ? value : undefined
-                });
+        // Get arguments
+        _.forEach(parser.getArguments(), parsed => {
+            this.args.push({
+                name: parsed.name,
+                value: parsed.parsedValue
             });
-        }
+        });
     }
 
     /**
      * Returns the name or alias of the called command as it was typed by the user. Does not include the prefix.
      */
-    getCommandName() : string {
+    public getCommandName() : string {
         return this.commandName;
     }
 
     /**
      * Returns the command this input is referencing, or null if there is no match.
      */
-    getCommand() : Command | null {
+    public getCommand() : Command | undefined {
         return this.command;
+    }
+
+    /**
+     * Returns an error encountered during input parsing, if applicable.
+     */
+    public getError() : Error | undefined {
+        return this.error;
     }
 
     /**
      * Returns the prefix used for this command.
      */
-    getPrefix() : string {
+    public getPrefix() : string {
         return this.prefix;
     }
 
     /**
      * Returns the text provided after the command name as one string.
      */
-    getText() : string {
+    public getText() : string {
         return this.text;
     }
 
@@ -170,7 +101,7 @@ export class Input {
      * Returns the value of the specified argument. If the argument is optional and was not provided by the
      * user, then the default value for the argument is returned (`null` unless otherwise specified).
      */
-    getArgument(name: string) : (Role | GuildMember | string | number | null | boolean | undefined) {
+    public getArgument(name: string) : (Role | GuildMember | string | number | null | boolean | undefined) {
         for (let i = 0; i < this.args.length; i++) {
             let arg = this.args[i];
 
@@ -186,7 +117,7 @@ export class Input {
      * Returns true if the input meets the requirements of the command (that is, all required arguments are
      * present in the input, and match the constraints).
      */
-    isProper() : boolean {
+    public isProper() : boolean {
         return this.compatible;
     }
 

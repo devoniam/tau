@@ -10,7 +10,7 @@ class Clear extends _api_1.Command {
                 {
                     name: 'amount',
                     description: 'The number of messages to clear.',
-                    pattern: /(\d+|all)/,
+                    patterns: /(\d+|all)/,
                     required: true,
                     usage: 'amount|all',
                     eval: (input) => input.toLowerCase() == 'all' || (parseInt(input) > 0 && parseInt(input) < 200)

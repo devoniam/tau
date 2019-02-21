@@ -1,10 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("./logger");
+const argument_1 = require("@core/internal/argument");
 class Command {
     constructor(options) {
         this.options = options;
         this.logger = new logger_1.Logger('command:' + this.options.name);
+        this.arguments = [];
+        if (this.options.arguments) {
+            _.forEach(this.options.arguments, argument => {
+                this.arguments.push(new argument_1.Argument(argument));
+            });
+        }
     }
     execute(input) {
         input.channel.send('This command is not yet implemented.');
@@ -31,33 +38,13 @@ class Command {
         return this.options.description;
     }
     getArguments() {
-        return this.options.arguments || [];
+        return this.arguments;
     }
     getUsage() {
         let usage = this.getName();
         let args = [];
         this.getArguments().forEach(arg => {
-            let text = arg.usage ? arg.usage : arg.name;
-            if (!arg.usage) {
-                if (!arg.options && arg.expand && !arg.default) {
-                    text += '...';
-                }
-                if (arg.options) {
-                    text = arg.options.join('|');
-                }
-                if (arg.default && !arg.required) {
-                    if (arg.default == '@member') {
-                        text += ' = you';
-                    }
-                    else {
-                        text += ' = ' + arg.default;
-                    }
-                }
-            }
-            if (arg.required)
-                args.push('<' + text + '>');
-            else
-                args.push('[' + text + ']');
+            args.push(arg.getUsage());
         });
         return `${usage} ${args.join(' ')}`.trim();
     }
