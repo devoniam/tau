@@ -17,23 +17,30 @@ class Framework {
         this.logger = new logger_1.Logger();
         this.loadConfiguration();
         this.bindGracefulShutdown();
-        this.logger.info('Logging in...');
-        this.client = new discord_js_1.Client();
-        this.client.login(this.config.authentication.discord.token);
-        this.client.on('ready', () => {
-            this.logger.clear();
-            this.logger.info('Logged in as %s.', this.client.user.tag);
-            this.logger.debug('Logged in with Client Id: %s', this.client.user.id);
-            this.logger.verbose('This client is a %s.', this.client.user.bot ? 'bot' : 'user');
-            this.logger.verbose('Found %d channels across %d guilds.', this.client.channels.size, this.client.guilds.size);
-            this.logger.debug('Loading components...');
+        if (!cli_1.CommandLine.hasFlag('dry')) {
+            this.logger.info('Logging in...');
+            this.client = new discord_js_1.Client();
+            this.client.login(this.config.authentication.discord.token);
+            this.client.on('ready', () => {
+                this.logger.clear();
+                this.logger.info('Logged in as %s.', this.client.user.tag);
+                this.logger.debug('Logged in with Client Id: %s', this.client.user.id);
+                this.logger.verbose('This client is a %s.', this.client.user.bot ? 'bot' : 'user');
+                this.logger.verbose('Found %d channels across %d guilds.', this.client.channels.size, this.client.guilds.size);
+                this.logger.debug('Loading components...');
+                this.loadCommands();
+                this.loadListeners();
+                this.loadScripts();
+                this.loadJobs();
+                this.listen();
+                this.logger.debug('Bot is online...');
+            });
+        }
+        else {
             this.loadCommands();
-            this.loadListeners();
             this.loadScripts();
             this.loadJobs();
-            this.listen();
-            this.logger.debug('Bot is online...');
-        });
+        }
     }
     static getConfig() {
         return this.config;
