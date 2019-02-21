@@ -24,6 +24,9 @@ class Argument {
         return [patterns];
     }
     getRegularExpression() {
+        if (this.getExpansive()) {
+            return /(.+)/;
+        }
         let expressions = this.getRegularExpressions();
         let compiled = [];
         _.each(expressions, expression => {

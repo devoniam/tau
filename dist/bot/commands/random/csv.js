@@ -20,7 +20,7 @@ class CSV extends _api_1.Command {
     }
     execute(input) {
         let list = input.getArgument('list');
-        let entries = list.split(/,+/);
+        let entries = list.split(/\s*,\s*/);
         input.channel.send('Not yet implemented.');
     }
 }

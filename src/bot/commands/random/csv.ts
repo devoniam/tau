@@ -20,7 +20,7 @@ export class CSV extends Command {
 
     execute(input: Input) {
         let list = input.getArgument('list') as string;
-        let entries = list.split(/,+/);
+        let entries = list.split(/\s*,\s*/);
 
         input.channel.send('Not yet implemented.');
     }

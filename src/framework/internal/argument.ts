@@ -53,6 +53,10 @@ export class Argument {
      * Returns the compiled regular expression for this argument.
      */
     public getRegularExpression() : RegExp {
+        if (this.getExpansive()) {
+            return /(.+)/;
+        }
+
         let expressions = this.getRegularExpressions();
         let compiled : string[] = [];
 
