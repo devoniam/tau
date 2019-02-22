@@ -43,7 +43,6 @@ class Framework {
         else {
             this.loadCommands();
             this.loadScripts();
-            this.loadJobs();
         }
     }
     static getConfig() {

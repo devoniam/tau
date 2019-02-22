@@ -63,7 +63,6 @@ export class Framework {
 
             this.loadCommands();
             this.loadScripts();
-            this.loadJobs();
         }
     }
 
