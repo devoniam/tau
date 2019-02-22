@@ -1,1 +1,0 @@
-{"version":3,"file":"guild.js","sourceRoot":"","sources":["../../../../../src/framework/lib/database/buckets/guild.ts"],"names":[],"mappings":";;AAAA,sCAAmC;AAEnC,MAAa,WAAY,SAAQ,eAAM;IAAvC;;QACc,UAAK,GAAG,QAAQ,CAAC;QAEpB,WAAM,GAAW,GAAG,CAAC;QACrB,UAAK,GAAuB;YAC/B,MAAM,EAAE,EAAE;SACb,CAAC;QACK,kBAAa,GAA8B;YAC9C,eAAe,EAAE,iCAAiC;SACrD,CAAC;IACN,CAAC;CAAA;AAVD,kCAUC"}

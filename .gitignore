@@ -84,4 +84,4 @@ $RECYCLE.BIN/
 config.json
 auth.json
 run bot.bat
-storage/primary
+data/storage

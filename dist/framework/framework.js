@@ -9,11 +9,12 @@ const readline = require("readline");
 const command_1 = require("./bot/command");
 const listener_1 = require("./bot/listener");
 const job_1 = require("./bot/job");
-const member_1 = require("./lib/database/buckets/member");
-const guild_1 = require("./lib/database/buckets/guild");
+const member_1 = require("./lib/database/member");
+const guild_1 = require("./lib/database/guild");
 const input_1 = require("./bot/input");
 const emoji_1 = require("@bot/libraries/emoji");
 const server_1 = require("./internal/server");
+const database_1 = require("./lib/database");
 class Framework {
     static start() {
         this.logger = new logger_1.Logger();
@@ -117,6 +118,8 @@ class Framework {
                     this.logger.verbose('Waiting for socket server to shut down...');
                     await this.server.stop();
                 }
+                this.logger.verbose('Closing database...');
+                await database_1.Database.close();
                 process.exit();
             }
         });
@@ -226,7 +229,7 @@ class Framework {
             if (member.user.bot)
                 return;
             if (!member.settings) {
-                member.settings = new member_1.MemberBucket(member.id);
+                member.settings = new member_1.MemberBucket(guild.id, member.id);
                 await member.settings.load();
             }
             let input = new input_1.Input(message);

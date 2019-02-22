@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
+const emoji_1 = require("@bot/libraries/emoji");
 class Prefix extends _api_1.Command {
     constructor() {
         super({
@@ -17,9 +18,12 @@ class Prefix extends _api_1.Command {
             ]
         });
     }
-    execute(input) {
+    async execute(input) {
         let char = input.getArgument('char');
-        input.channel.send('Not yet implemented.');
+        let settings = input.guild.settings;
+        settings.prefix = char;
+        await settings.save();
+        input.channel.send(emoji_1.Emoji.SUCCESS + '  Your custom prefix has been set. Now give it a try!');
     }
 }
 exports.Prefix = Prefix;

@@ -1,5 +1,5 @@
-import { MemberBucket } from '@libraries/database/buckets/member';
-import { GuildBucket } from '@libraries/database/buckets/guild';
+import { MemberBucket } from '@core/lib/database/member';
+import { GuildBucket } from '@core/lib/database/guild';
 
 declare module 'discord.js' {
     export interface Guild {

@@ -9,11 +9,12 @@ import * as readline from 'readline';
 import { Command } from './bot/command';
 import { Listener } from './bot/listener';
 import { Job } from './bot/job';
-import { MemberBucket } from './lib/database/buckets/member';
-import { GuildBucket } from './lib/database/buckets/guild';
+import { MemberBucket } from './lib/database/member';
+import { GuildBucket } from './lib/database/guild';
 import { Input } from './bot/input';
 import { Emoji } from '@bot/libraries/emoji';
 import { Server } from './internal/server';
+import { Database } from './lib/database';
 
 export class Framework {
     private static config: BotConfiguration;
@@ -179,6 +180,10 @@ export class Framework {
                     await this.server.stop();
                 }
 
+                // Stop the database
+                this.logger.verbose('Closing database...');
+                await Database.close();
+
                 // Exit, code 0
                 process.exit();
             }
@@ -338,7 +343,7 @@ export class Framework {
 
             // Load member settings
             if (!member.settings) {
-                member.settings = new MemberBucket(member.id);
+                member.settings = new MemberBucket(guild.id, member.id);
                 await member.settings.load();
             }
 

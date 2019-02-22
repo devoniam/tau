@@ -1,4 +1,5 @@
 import { Command, Input } from '@api';
+import { Emoji } from '@bot/libraries/emoji';
 
 export class Prefix extends Command {
     constructor() {
@@ -17,9 +18,15 @@ export class Prefix extends Command {
         });
     }
 
-    execute(input: Input) {
+    async execute(input: Input) {
         let char = input.getArgument('char') as string;
+        let settings = input.guild.settings;
 
-        input.channel.send('Not yet implemented.');
+        // Set the new prefix
+        settings.prefix = char;
+        await settings.save();
+
+        // Confirm
+        input.channel.send(Emoji.SUCCESS + '  Your custom prefix has been set. Now give it a try!');
     }
 }
