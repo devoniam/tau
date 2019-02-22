@@ -13,10 +13,12 @@ const member_1 = require("./lib/database/buckets/member");
 const guild_1 = require("./lib/database/buckets/guild");
 const input_1 = require("./bot/input");
 const emoji_1 = require("@bot/libraries/emoji");
+const server_1 = require("./internal/server");
 class Framework {
     static start() {
         this.logger = new logger_1.Logger();
         this.loadConfiguration();
+        this.startServer();
         this.bindGracefulShutdown();
         if (!cli_1.CommandLine.hasFlag('dry')) {
             this.logger.info('Logging in...');
@@ -77,10 +79,16 @@ class Framework {
             fs.writeFileSync(configFilePath, JSON.stringify({
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
+                server: { enabled: true, port: 3121 },
                 authentication: { discord: { token: '' }, cleverbot: { user: '', key: '' } }
             }, null, 4));
             return welcome();
         }
+    }
+    static startServer() {
+        this.logger.verbose('Starting socket server on port %d...', this.config.server.port || 3121);
+        this.server = new server_1.Server(this.config.server.port);
+        this.server.start();
     }
     static bindGracefulShutdown() {
         if (process.platform === 'win32') {
@@ -92,16 +100,23 @@ class Framework {
                 process.emit('SIGINT');
             });
         }
-        process.on('SIGINT', () => {
+        process.on('SIGINT', async () => {
             if (!cli_1.CommandLine.hasFlag('dry')) {
                 this.logger.info('Stopping gracefully...');
                 this.logger.verbose('Waiting for client to sign off...');
-                this.client.destroy().then(() => {
-                    this.logger.verbose('All done, sayonara!');
-                    process.exit();
-                });
+                await this.client.destroy();
+                if (this.server) {
+                    this.logger.verbose('Waiting for socket server to shut down...');
+                    await this.server.stop();
+                }
+                this.logger.verbose('All done, sayonara!');
+                process.exit();
             }
             else {
+                if (this.server) {
+                    this.logger.verbose('Waiting for socket server to shut down...');
+                    await this.server.stop();
+                }
                 process.exit();
             }
         });

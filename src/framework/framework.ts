@@ -13,12 +13,14 @@ import { MemberBucket } from './lib/database/buckets/member';
 import { GuildBucket } from './lib/database/buckets/guild';
 import { Input } from './bot/input';
 import { Emoji } from '@bot/libraries/emoji';
+import { Server } from './internal/server';
 
 export class Framework {
     private static config: BotConfiguration;
     private static client: Client;
     private static logger: Logger;
     private static commands: Command[] = [];
+    private static server?: Server;
 
     /**
      * Starts the bot.
@@ -28,6 +30,7 @@ export class Framework {
 
         // Bootstrap
         this.loadConfiguration();
+        this.startServer();
         this.bindGracefulShutdown();
 
         if (!CommandLine.hasFlag('dry')) {
@@ -119,11 +122,21 @@ export class Framework {
             fs.writeFileSync(configFilePath, JSON.stringify({
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
+                server: { enabled: true, port: 3121 },
                 authentication: { discord: { token: '' }, cleverbot: { user: '', key: '' }}
             } as BotConfiguration, null, 4));
 
             return welcome();
         }
+    }
+
+    /**
+     * Starts the internal socket server.
+     */
+    private static startServer() {
+        this.logger.verbose('Starting socket server on port %d...', this.config.server.port || 3121);
+        this.server = new Server(this.config.server.port);
+        this.server.start();
     }
 
     /**
@@ -141,17 +154,32 @@ export class Framework {
             });
         }
 
-        process.on('SIGINT', () => {
+        process.on('SIGINT', async () => {
             if (!CommandLine.hasFlag('dry')) {
                 this.logger.info('Stopping gracefully...');
                 this.logger.verbose('Waiting for client to sign off...');
 
-                this.client.destroy().then(() => {
-                    this.logger.verbose('All done, sayonara!');
-                    process.exit();
-                });
+                // Stop the client
+                await this.client.destroy();
+
+                // Stop the server if it is active
+                if (this.server) {
+                    this.logger.verbose('Waiting for socket server to shut down...');
+                    await this.server.stop();
+                }
+
+                // Exit, code 0
+                this.logger.verbose('All done, sayonara!');
+                process.exit();
             }
             else {
+                // Stop the server if it is active
+                if (this.server) {
+                    this.logger.verbose('Waiting for socket server to shut down...');
+                    await this.server.stop();
+                }
+
+                // Exit, code 0
                 process.exit();
             }
         });
@@ -367,6 +395,10 @@ type BotConfiguration = {
         allowCodeExecution: boolean;
         loggingLevel: 'normal' | 'debug' | 'verbose';
     };
+    server: {
+        enabled: boolean;
+        port?: number;
+    }
     authentication: {
         discord: {
             token: string
