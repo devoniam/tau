@@ -25,7 +25,8 @@
                 "bot/libraries/*",
                 "framework/lib/*"
             ]
-        }
+        },
+        "newLine": "LF"
     },
     "compileOnSave": true,
     "exclude": [
