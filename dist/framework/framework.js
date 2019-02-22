@@ -246,6 +246,8 @@ class Framework {
     }
     static listen() {
         this.client.on('message', async (message) => {
+            if (message.channel.type !== 'text')
+                return;
             let member = message.member;
             let guild = message.guild;
             if (!guild.settings) {

@@ -360,6 +360,9 @@ export class Framework {
      */
     private static listen() {
         this.client.on('message', async message => {
+            // Only listen to text channels on guilds
+            if (message.channel.type !== 'text') return;
+
             // Get the guild and member
             let member = message.member;
             let guild = message.guild;

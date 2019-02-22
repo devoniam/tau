@@ -1,4 +1,5 @@
 import { Command, Input } from '@api';
+import { Framework } from '@core/framework';
 
 export class Ping extends Command {
     constructor() {
@@ -9,6 +10,9 @@ export class Ping extends Command {
     }
 
     execute(input: Input) {
-        input.channel.send('Not yet implemented.');
+        //input.channel.send('Not yet implemented.');
+        let pingValue = Framework.getClient().ping;
+        pingValue = Number(pingValue.toPrecision(4));
+        input.channel.send(":satellite: Bot's last ping to server was **" + pingValue + " ms.**");
     }
 }
