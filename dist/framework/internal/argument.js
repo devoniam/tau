@@ -146,6 +146,15 @@ class Argument {
                 return false;
             }
         });
+        if (this.getOptions()) {
+            _.each(this.getOptions(), option => {
+                if (typeof option == 'string') {
+                    if (option.toLowerCase() == content.toLowerCase()) {
+                        match = option;
+                    }
+                }
+            });
+        }
         return match;
     }
     parseForConstraint(content, constraint, guild) {

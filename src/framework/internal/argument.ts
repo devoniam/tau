@@ -234,6 +234,17 @@ export class Argument {
             }
         });
 
+        // Convert options to the correct character case
+        if (this.getOptions()) {
+            _.each(this.getOptions(), option => {
+                if (typeof option == 'string') {
+                    if (option.toLowerCase() == content.toLowerCase()) {
+                        match = option;
+                    }
+                }
+            });
+        }
+
         return match;
     }
 
