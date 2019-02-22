@@ -16,6 +16,8 @@ import { Emoji } from '@bot/libraries/emoji';
 import { Server } from './internal/server';
 import { Database } from './lib/database';
 
+import chalk from 'chalk';
+
 export class Framework {
     private static config: BotConfiguration;
     private static client: Client;
@@ -200,19 +202,27 @@ export class Framework {
             let files = this.getFilesSync(inDirectory);
 
             return files.forEach(filePath => {
-                this.logger.verbose('Hit:', filePath);
-                let classes = require(filePath);
+                let fileName = filePath.substring(inDirectory.length + 1);
 
-                for (let className in classes) {
-                    let command = classes[className];
+                try {
+                    this.logger.verbose('Hit:', filePath);
+                    let classes = require(filePath);
 
-                    if (typeof command === 'function') {
-                        let instance = new command();
+                    for (let className in classes) {
+                        let command = classes[className];
 
-                        if (instance instanceof Command) {
-                            this.commands.push(instance);
+                        if (typeof command === 'function') {
+                            let instance = new command();
+
+                            if (instance instanceof Command) {
+                                this.commands.push(instance);
+                            }
                         }
                     }
+                }
+                catch (error) {
+                    this.logger.error(`Encountered an error when loading commands/${fileName}:`);
+                    this.logger.error(error);
                 }
             });
         }
@@ -231,19 +241,27 @@ export class Framework {
             let files = this.getFilesSync(inDirectory);
 
             return files.forEach(filePath => {
-                this.logger.verbose('Hit:', filePath);
-                let classes = require(filePath);
+                let fileName = filePath.substring(inDirectory.length + 1);
 
-                for (let className in classes) {
-                    let listener = classes[className];
+                try {
+                    this.logger.verbose('Hit:', filePath);
+                    let classes = require(filePath);
 
-                    if (typeof listener === 'function') {
-                        let instance = new listener();
+                    for (let className in classes) {
+                        let listener = classes[className];
 
-                        if (instance instanceof Listener) {
-                            instance.start();
+                        if (typeof listener === 'function') {
+                            let instance = new listener();
+
+                            if (instance instanceof Listener) {
+                                instance.start();
+                            }
                         }
                     }
+                }
+                catch (error) {
+                    this.logger.error(`Encountered an error when loading listeners/${fileName}:`);
+                    this.logger.error(error);
                 }
             });
         }
@@ -262,8 +280,16 @@ export class Framework {
             let files = this.getFilesSync(inDirectory);
 
             return files.forEach(filePath => {
-                this.logger.verbose('Hit:', filePath);
-                require(filePath);
+                let fileName = filePath.substring(inDirectory.length + 1);
+
+                try {
+                    this.logger.verbose('Hit:', filePath);
+                    require(filePath);
+                }
+                catch (error) {
+                    this.logger.error(`Encountered an error when loading scripts/${fileName}:`);
+                    this.logger.error(error);
+                }
             });
         }
 
@@ -281,19 +307,27 @@ export class Framework {
             let files = this.getFilesSync(inDirectory);
 
             return files.forEach(filePath => {
-                this.logger.verbose('Hit:', filePath);
-                let classes = require(filePath);
+                let fileName = filePath.substring(inDirectory.length + 1);
 
-                for (let className in classes) {
-                    let job = classes[className];
+                try {
+                    this.logger.verbose('Hit:', filePath);
+                    let classes = require(filePath);
 
-                    if (typeof job === 'function') {
-                        let instance = new job();
+                    for (let className in classes) {
+                        let job = classes[className];
 
-                        if (instance instanceof Job) {
-                            instance.start();
+                        if (typeof job === 'function') {
+                            let instance = new job();
+
+                            if (instance instanceof Job) {
+                                instance.start();
+                            }
                         }
                     }
+                }
+                catch (error) {
+                    this.logger.error(`Encountered an error when loading jobs/${fileName}:`);
+                    this.logger.error(error);
                 }
             });
         }
@@ -355,7 +389,32 @@ export class Framework {
             // Run the command
             if (command) {
                 if (input.isProper()) {
-                    command.execute(input);
+                    let commandName = command.getName();
+
+                    try {
+                        // Only show the server name on production
+                        let serverId = (this.getEnvironment() == 'production') ? `${chalk.gray(input.guild.name)}: ` : '';
+
+                        // Log the command to the console
+                        this.logger.info(`${serverId}${input.member.user.tag} issued command: ${input.message.content}`);
+
+                        // Execute the command
+                        let returned = command.execute(input);
+
+                        // If the command returns a promise, catch errors from it
+                        if (Promise.resolve(returned) == returned) {
+                            returned.catch(error => {
+                                this.logger.error(`Encountered an error when running ${commandName} command:`);
+                                this.logger.error(error);
+                                input.channel.send(':tools:  Internal error, check console.');
+                            });
+                        }
+                    }
+                    catch (error) {
+                        this.logger.error(`Encountered an error when running ${commandName} command:`);
+                        this.logger.error(error);
+                        input.channel.send(':tools:  Internal error, check console.');
+                    }
                 }
                 else {
                     let error = input.getError();
