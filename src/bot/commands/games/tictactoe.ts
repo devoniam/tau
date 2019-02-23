@@ -40,9 +40,9 @@ export class TicTacToe extends Command {
 
     /**
      * Queue a lobby
-     * 
-     * @param input 
-     * @param options 
+     *
+     * @param input
+     * @param options
      */
     private start(input: Input, options: string | undefined) {
         input.channel.send("Opening tic tac toe lobby in this chat.");
@@ -52,9 +52,9 @@ export class TicTacToe extends Command {
 
     /**
      * Join a lobby
-     * 
-     * @param input 
-     * @param options 
+     *
+     * @param input
+     * @param options
      */
     private join(input: Input, options: string | undefined) {
         let lobbiesInServer = this.tttLobbyManager.GetLobbiesInChannel(input.guild, input.channel);
@@ -95,9 +95,9 @@ export class TicTacToe extends Command {
 
     /**
      * Check is index of lobby is valid
-     * 
-     * @param lobbyNumber 
-     * @param lobbiesInServer 
+     *
+     * @param lobbyNumber
+     * @param lobbiesInServer
      */
     private numberIsValidLobby(lobbyNumber: number, lobbiesInServer: TTTLobby[]) {
         return lobbyNumber >= 0 && lobbyNumber < lobbiesInServer.length;
@@ -105,10 +105,10 @@ export class TicTacToe extends Command {
 
     /**
      * display list of lobbies
-     * 
-     * @param lobbiesInServer 
-     * @param message 
-     * @param input 
+     *
+     * @param lobbiesInServer
+     * @param message
+     * @param input
      */
     private displayAllLobbies(lobbiesInServer: TTTLobby[], message: string, input: Input) {
         for (let index = 0; index < lobbiesInServer.length; index++) {
@@ -120,10 +120,10 @@ export class TicTacToe extends Command {
                 message += "empty";
             }
             if (currentLobby.GetPlayer(1) !== null) {
-                message += this.addPlayerNameToMessage(currentLobby.GetPlayer(1));
+                message += this.addPlayerNameToMessage(currentLobby.GetPlayer(1) as GuildMember);
             }
             if (currentLobby.GetPlayer(2) !== null) {
-                message += this.addPlayerNameToMessage((currentLobby.GetPlayer(2)));
+                message += this.addPlayerNameToMessage(currentLobby.GetPlayer(2) as GuildMember);
             }
         }
 
@@ -135,7 +135,7 @@ export class TicTacToe extends Command {
 
     /**
      * adds the player's name to the message
-     * 
+     *
      * @param player
      */
     private addPlayerNameToMessage(player: GuildMember) {

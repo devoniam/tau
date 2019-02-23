@@ -77,7 +77,7 @@ class TicTacToe extends _api_1.Command {
                 message += this.addPlayerNameToMessage(currentLobby.GetPlayer(1));
             }
             if (currentLobby.GetPlayer(2) !== null) {
-                message += this.addPlayerNameToMessage((currentLobby.GetPlayer(2)));
+                message += this.addPlayerNameToMessage(currentLobby.GetPlayer(2));
             }
         }
         input.channel.send("```" + message + "```");

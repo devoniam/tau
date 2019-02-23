@@ -144,7 +144,7 @@ export class TTTLobby {
 
             console.log(`${x} ${y}`);
 
-            successfullyChangedTile = self.board.ChangeTile(x, y, playerSpaceIcon);
+            successfullyChangedTile = self.board.ChangeTile(x, y, playerSpaceIcon as boardEnums.SpaceEnum);
 
             if (successfullyChangedTile){
                 //flips player turn
