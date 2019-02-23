@@ -45,10 +45,10 @@ export class TTTLobby {
         this.lobbyChannel = channel;
         this.lobbyServer = server;
 
-        this.rowString = `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.A]}` 
+        this.rowString = `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.A]}`
                   + `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.B]}`
                   + `$${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.C]}`;
-        
+
         this.colString = `${tttEnums.rowColumnEnum.A}`
                        + `${tttEnums.rowColumnEnum.B}`
                        + `${tttEnums.rowColumnEnum.C}`;
@@ -79,7 +79,8 @@ export class TTTLobby {
 
         let playerWithTurn = this.GetPlayerWithTurn();
         let playerSpaceIcon = this.GetPlayerWithTurnSpaceIcon();
-        if (typeof playerWithTurn !== null)
+
+        if (playerWithTurn)
         {
             //No VS Code it CANT be null, I checked.
             this.lobbyChannel.send(`\n${playerWithTurn.displayName}'s turn`);
@@ -159,7 +160,7 @@ export class TTTLobby {
     GetLobbyChannel() : TextChannel | DMChannel | GroupDMChannel {
         return this.lobbyChannel;
     }
-    
+
     GetLobbyServer() : Guild {
         return this.lobbyServer;
     }

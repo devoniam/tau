@@ -57,7 +57,7 @@ class TTTLobby {
         this.lobbyChannel.send(this.board.GetBoardVisual());
         let playerWithTurn = this.GetPlayerWithTurn();
         let playerSpaceIcon = this.GetPlayerWithTurnSpaceIcon();
-        if (typeof playerWithTurn !== null) {
+        if (playerWithTurn) {
             this.lobbyChannel.send(`\n${playerWithTurn.displayName}'s turn`);
         }
         let winner = this.board.CheckForWinner();
