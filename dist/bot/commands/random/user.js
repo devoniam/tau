@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
+let callLimit = 10;
 class User extends _api_1.Command {
     constructor() {
         super({
@@ -20,7 +21,14 @@ class User extends _api_1.Command {
                     constraint: 'number',
                     default: 1,
                     error: true,
-                    eval: (input) => input >= 1 && input <= 20
+                    eval: (input) => {
+                        if (input <= 0)
+                            return false;
+                        if (input > callLimit) {
+                            throw new Error('Maximum number of users is ' + callLimit);
+                        }
+                        return true;
+                    }
                 }
             ]
         });
@@ -28,7 +36,24 @@ class User extends _api_1.Command {
     execute(input) {
         let role = input.getArgument('role');
         let amount = input.getArgument('amount');
-        input.channel.send('Not yet implemented.');
+        if (role && amount > 0) {
+            if (amount > role.members.size) {
+                amount = role.members.size;
+            }
+            console.log('amount:' + amount);
+            let members = role.members.random(amount);
+            input.channel.send(members.join(', '));
+        }
+        else {
+            if (amount > input.guild.memberCount) {
+                amount = input.guild.memberCount;
+            }
+            if (amount) {
+                let members = input.guild.members.random(amount);
+                console.log("guild.memberCount: " + amount);
+                input.channel.send(members.join(', '));
+            }
+        }
     }
 }
 exports.User = User;
