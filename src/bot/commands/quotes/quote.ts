@@ -80,7 +80,7 @@ export class Quote extends Command {
                         let member: string;
                         if (input.guild.member(q.memberId)) {
                             member = input.guild.member(q.memberId).displayName;
-                        } else { 
+                        } else {
                             member = "Anonymous";
                         }
 
@@ -98,7 +98,7 @@ export class Quote extends Command {
                 if (_.size(db.quotes) > 0) {
                     //from specific user
                     if (user) {
-                        let userQuotes = _.filter(db.quotes, function(o) { return o.memberId == user.id; })
+                        let userQuotes = _.filter(db.quotes, function(o) { return o.memberId == (user as GuildMember).id; })
                         let id = _.random(0, _.size(userQuotes)-1);
                         input.channel.send('**[' + (db.quotes.indexOf(userQuotes[id])+1).toString() + ']** - ' + userQuotes[id].message + ' —' + user.displayName);
                     //from all users
@@ -107,7 +107,7 @@ export class Quote extends Command {
                         let member: string;
                         if (input.guild.member(db.quotes[id].memberId)) {
                             member = input.guild.member(db.quotes[id].memberId).displayName;
-                        } else { 
+                        } else {
                             member = "Anonymous";
                         }
                         input.channel.send('**[' + (id+1).toString() + ']** - ' + db.quotes[id].message + ' —' + member);
