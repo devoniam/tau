@@ -32,10 +32,10 @@ export class Parser {
 
         // Detect errors within optional arguments
         // This can get pretty tricky so I'm separating it from parse()
-        this.findErrors();
-
-        // If everything is going okay so far, check argument evaluators
-        this.evaluate();
+        if (!this.findErrors()) {
+            // If everything is going okay so far, check argument evaluators
+            this.evaluate();
+        }
     }
 
     /**
@@ -135,9 +135,10 @@ export class Parser {
     }
 
     /**
-     * Detects errors in optional arguments after parsing.
+     * Detects errors in optional arguments after parsing. Returns `false` if everything is okay, or `true` if there is
+     * an error.
      */
-    private findErrors() {
+    private findErrors() : boolean {
         _.forEach(this.parsedArguments, parsed => {
             if (!parsed.error && parsed.required && parsed.parsedValue == undefined) {
                 let an = /^[aeiou]/i.test(parsed.name) ? 'an' : 'a';
@@ -154,6 +155,8 @@ export class Parser {
             parsed.error = true;
             return false;
         });
+
+        return this.getError() ? true : false;
     }
 
     /**
