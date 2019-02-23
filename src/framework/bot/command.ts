@@ -2,6 +2,7 @@ import { GuildMember, Role } from 'discord.js';
 import { Input } from '@core/api';
 import { Logger } from './logger';
 import { Argument } from '@core/internal/argument';
+import { ParsedArgument } from '@core/internal/parser';
 
 export abstract class Command {
     private logger: Logger;
@@ -204,7 +205,7 @@ export type CommandArgument = {
      * **Note #2:** You can throw an `Error` from this function and the bot will respond with the error's message. This
      * can help provide contextual feedback to the user when giving an incorrect value.
      */
-    eval?: (input: any) => boolean;
+    eval?: (input: any, args: ParsedArgument[]) => boolean;
 
     /**
      * The message to display if this argument fails. If not specified, the command's usage string will be displayed.

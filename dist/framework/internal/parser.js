@@ -101,7 +101,7 @@ class Parser {
             let evaluator = parsed.argument.getEvaluator();
             if (evaluator) {
                 try {
-                    if (!evaluator(parsed.parsedValue)) {
+                    if (!evaluator(parsed.parsedValue, this.parsedArguments)) {
                         parsed.error = true;
                         parsed.errorMessage = parsed.argument.getErrorMessage() || `Please enter a valid ${parsed.name}.`;
                     }

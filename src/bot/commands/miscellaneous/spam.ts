@@ -48,7 +48,7 @@ export class Spam extends Command {
         if (user === null){
             input.channel.send("I need a user to spam, use @ to select a user");
             return;
-        } 
+        }
 
         if (isNaN(amount)){
             amount = 3;
@@ -92,13 +92,13 @@ export class Spam extends Command {
 
             return messages;
         }
-        
+
         return [input];
     }
 
     private async SpamTime(target: GuildMember, numMessages: number, delayBetweenMessages: number, messages: string[]){
         let wait = (delayInMilliseconds : number) => new Promise ((resolve, reject) => setTimeout(() => {
-            resolve(); 
+            resolve();
             this.CalculateAndSendMessage(messages, target)
         }, delayInMilliseconds));
 
