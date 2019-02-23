@@ -1,5 +1,3 @@
-import { Framework } from '../../framework/framework';
-
 export enum Emoji {
     /**
      * A filled green circle with a white checkmark.
