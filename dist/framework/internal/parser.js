@@ -11,8 +11,9 @@ class Parser {
         this.parsedContentBuffer = content;
         this.compiledArguments = this.getCompiledArguments();
         this.parse();
-        this.findErrors();
-        this.evaluate();
+        if (!this.findErrors()) {
+            this.evaluate();
+        }
     }
     getError() {
         let failed;
@@ -93,6 +94,7 @@ class Parser {
             parsed.error = true;
             return false;
         });
+        return this.getError() ? true : false;
     }
     evaluate() {
         _.forEach(this.parsedArguments, parsed => {
