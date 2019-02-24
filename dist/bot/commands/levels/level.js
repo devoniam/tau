@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
+const experience_1 = require("@bot/libraries/experience");
 class Level extends _api_1.Command {
     constructor() {
         super({
@@ -16,9 +17,10 @@ class Level extends _api_1.Command {
             ]
         });
     }
-    execute(input) {
+    async execute(input) {
         let user = input.getArgument('user');
-        input.channel.send('Not yet implemented.');
+        let goal = await experience_1.Experience.getExperienceGoal(user);
+        input.channel.send(`:sparkles:  ${user} is level **${user.settings.level}** and needs **${goal}** more points to level up.`);
     }
 }
 exports.Level = Level;

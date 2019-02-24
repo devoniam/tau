@@ -1,5 +1,6 @@
 import { Command, Input } from '@api';
 import { GuildMember } from 'discord.js';
+import { Experience } from '@bot/libraries/experience';
 
 export class Level extends Command {
     constructor() {
@@ -17,9 +18,10 @@ export class Level extends Command {
         });
     }
 
-    execute(input: Input) {
+    async execute(input: Input) {
         let user = input.getArgument('user') as GuildMember;
+        let goal = await Experience.getExperienceGoal(user);
 
-        input.channel.send('Not yet implemented.');
+        input.channel.send(`:sparkles:  ${user} is level **${user.settings.level}** and needs **${goal}** more points to level up.`);
     }
 }
