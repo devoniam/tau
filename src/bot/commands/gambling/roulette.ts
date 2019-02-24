@@ -1,5 +1,5 @@
 import { Command, Input } from "@api";
-import { Attachment } from "discord.js";
+import { Message } from "discord.js";
 import * as fs from 'fs';
 import { Emoji } from "@bot/libraries/emoji";
 
