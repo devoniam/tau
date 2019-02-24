@@ -267,16 +267,22 @@ class Framework {
             if (command) {
                 if (input.isProper()) {
                     let commandName = command.getName();
+                    let serverId = (this.getEnvironment() == 'production') ? `${chalk_1.default.gray(input.guild.name)}: ` : '';
                     try {
-                        let serverId = (this.getEnvironment() == 'production') ? `${chalk_1.default.gray(input.guild.name)}: ` : '';
                         this.logger.info(`${serverId}${input.member.user.tag} issued command: ${input.message.content}`);
-                        let returned = command.execute(input);
-                        if (Promise.resolve(returned) == returned) {
-                            returned.catch(error => {
-                                this.logger.error(`Encountered an error when running ${commandName} command:`);
-                                this.logger.error(error);
-                                input.channel.send(':tools:  Internal error, check console.');
-                            });
+                        if (command.getPermission() == undefined || input.member.hasPermission(command.getPermission())) {
+                            let returned = command.execute(input);
+                            if (Promise.resolve(returned) == returned) {
+                                returned.catch(error => {
+                                    this.logger.error(`Encountered an error when running ${commandName} command:`);
+                                    this.logger.error(error);
+                                    input.channel.send(':tools:  Internal error, check console.');
+                                });
+                            }
+                        }
+                        else {
+                            this.logger.info(`${serverId}${input.member.user.tag} was denied access to command.`);
+                            input.channel.send(`${emoji_1.Emoji.ERROR}  You don't have permissions to run that command, sorry.`);
                         }
                     }
                     catch (error) {

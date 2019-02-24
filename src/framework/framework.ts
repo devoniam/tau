@@ -394,23 +394,30 @@ export class Framework {
                 if (input.isProper()) {
                     let commandName = command.getName();
 
-                    try {
-                        // Only show the server name on production
-                        let serverId = (this.getEnvironment() == 'production') ? `${chalk.gray(input.guild.name)}: ` : '';
+                    // Only show the server name on production
+                    let serverId = (this.getEnvironment() == 'production') ? `${chalk.gray(input.guild.name)}: ` : '';
 
+                    try {
                         // Log the command to the console
                         this.logger.info(`${serverId}${input.member.user.tag} issued command: ${input.message.content}`);
 
-                        // Execute the command
-                        let returned = command.execute(input);
+                        if (command.getPermission() == undefined || input.member.hasPermission(command.getPermission() as any)) {
+                            // Execute the command
+                            let returned = command.execute(input);
 
-                        // If the command returns a promise, catch errors from it
-                        if (Promise.resolve(returned) == returned) {
-                            returned.catch(error => {
-                                this.logger.error(`Encountered an error when running ${commandName} command:`);
-                                this.logger.error(error);
-                                input.channel.send(':tools:  Internal error, check console.');
-                            });
+                            // If the command returns a promise, catch errors from it
+                            if (Promise.resolve(returned) == returned) {
+                                returned.catch(error => {
+                                    this.logger.error(`Encountered an error when running ${commandName} command:`);
+                                    this.logger.error(error);
+                                    input.channel.send(':tools:  Internal error, check console.');
+                                });
+                            }
+                        }
+                        else {
+                            // Log the command to the console
+                            this.logger.info(`${serverId}${input.member.user.tag} was denied access to command.`);
+                            input.channel.send(`${Emoji.ERROR}  You don't have permissions to run that command, sorry.`);
                         }
                     }
                     catch (error) {

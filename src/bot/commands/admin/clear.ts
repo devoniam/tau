@@ -7,6 +7,7 @@ export class Clear extends Command {
         super({
             name: 'clear',
             description: 'Clears messages from the current channel.',
+            permission: 'manageMessages',
             arguments: [
                 {
                     name: 'amount',

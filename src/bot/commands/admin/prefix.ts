@@ -6,6 +6,7 @@ export class Prefix extends Command {
         super({
             name: 'prefix',
             description: 'Changes the prefix for the bot for a server.',
+            permission: 'administrator',
             arguments: [
                 {
                     name: 'char',
