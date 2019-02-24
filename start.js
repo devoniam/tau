@@ -3,6 +3,17 @@ const fs = require('fs');
 
 // Add lodash as a global variable (see /src/framework/types/global.d.ts)
 global._ = require('lodash');
+global.pub = function(p) {
+    return path.join(__dirname, 'public', p);
+};
+
+String.prototype.equalsIgnoreCase = (function(o) {
+    return o.toLowerCase() == this.toLowerCase();
+});
+
+String.prototype.equals = (function(o) {
+    return o == this;
+});
 
 // Add typescript sourcemapping for stack traces
 try { require('source-map-support').install(); }

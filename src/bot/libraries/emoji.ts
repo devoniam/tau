@@ -15,5 +15,11 @@ export enum Emoji {
      * A filled blue circle with a question mark.
      * @source Production Studio Server
      */
-    HELP = '<:help:548039531547328562>'
+    HELP = '<:help:548039531547328562>',
+
+    /**
+     * A spinning loading emoji that only looks good on dark backgrounds.
+     * @source Production Studio Server
+     */
+    LOADING = '<a:loading:549174816217890828>'
 };
