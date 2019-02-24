@@ -20,7 +20,6 @@ export class Balance extends Command {
 
     execute(input: Input) {
         let user = input.getArgument('user') as GuildMember;
-
-        input.channel.send('Not yet implemented.');
+        input.channel.send(`:moneybag:  Current balance for ${user} is **$${user.settings.currency.toFixed(2)}**.`);
     }
 }

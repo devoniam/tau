@@ -19,7 +19,7 @@ class Balance extends _api_1.Command {
     }
     execute(input) {
         let user = input.getArgument('user');
-        input.channel.send('Not yet implemented.');
+        input.channel.send(`:moneybag:  Current balance for ${user} is **$${user.settings.currency.toFixed(2)}**.`);
     }
 }
 exports.Balance = Balance;
