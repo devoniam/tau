@@ -2,6 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
 const emoji_1 = require("@bot/libraries/emoji");
+const remarks = [
+    'Back to the better days.',
+    'Like they never happened.',
+    'Not even a trace.',
+    'That looks better.',
+    'The shine won\'t last long.'
+];
 class Clear extends _api_1.Command {
     constructor() {
         super({
@@ -31,7 +38,7 @@ class Clear extends _api_1.Command {
     async execute(input) {
         let amount = input.getArgument('amount');
         let limit = amount.equalsIgnoreCase('all') ? null : parseInt(amount);
-        let message = await input.channel.send(':clock4:  Hold on...');
+        let message = await input.channel.send(`${emoji_1.Emoji.LOADING}  Getting ready...`);
         let messagesToDelete = await this.getMessages(input.channel, limit, message.id);
         let originalSize = messagesToDelete.length;
         if (messagesToDelete.length == 0) {
@@ -49,7 +56,7 @@ class Clear extends _api_1.Command {
                 await message.edit(`${emoji_1.Emoji.LOADING}  Clearing ${messagesToDelete.length} messages (${percent}%)...`);
             }
         }
-        await message.edit(`${emoji_1.Emoji.SUCCESS}  Cleared ${originalSize} messages.`);
+        await message.edit(`${emoji_1.Emoji.SUCCESS}  Cleared ${originalSize} messages. ${_.sample(remarks)}`);
         setTimeout(message.delete.bind(message), 5000);
     }
     async getMessages(channel, limit, before) {

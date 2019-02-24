@@ -2,6 +2,14 @@ import { Command, Input } from '@api';
 import { Emoji } from '@bot/libraries/emoji';
 import { Message, TextChannel, Collection, Snowflake } from 'discord.js';
 
+const remarks = [
+    'Back to the better days.',
+    'Like they never happened.',
+    'Not even a trace.',
+    'That looks better.',
+    'The shine won\'t last long.'
+];
+
 export class Clear extends Command {
     constructor() {
         super({
@@ -29,7 +37,7 @@ export class Clear extends Command {
     async execute(input: Input) {
         let amount = input.getArgument('amount') as string;
         let limit = amount.equalsIgnoreCase('all') ? null : parseInt(amount);
-        let message = await input.channel.send(':clock4:  Hold on...') as Message;
+        let message = await input.channel.send(`${Emoji.LOADING}  Getting ready...`) as Message;
         let messagesToDelete = await this.getMessages(input.channel as TextChannel, limit, message.id);
         let originalSize = messagesToDelete.length;
 
@@ -58,7 +66,7 @@ export class Clear extends Command {
             }
         }
 
-        await message.edit(`${Emoji.SUCCESS}  Cleared ${originalSize} messages.`);
+        await message.edit(`${Emoji.SUCCESS}  Cleared ${originalSize} messages. ${_.sample(remarks)}`);
         setTimeout(message.delete.bind(message), 5000);
     }
 
