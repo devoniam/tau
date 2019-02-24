@@ -24,12 +24,33 @@ String.prototype.equals = (function(o) {
     return o == this;
 });
 
-// Add to message prototype
-const { Message } = require('discord.js');
+// Add to message and guild prototypes
+
+const { Message, Guild } = require('discord.js');
+
 Message.prototype.deleteAfter = (function(ms) {
     setTimeout(() => {
         this.delete().catch(err => {});
     }, ms);
+});
+
+Guild.prototype.getDefaultChannel = (function() {
+    let channels = this.channels.array();
+    let user = require('@core/framework').Framework.getClient().user;
+
+    if (this.systemChannel && this.systemChannel.permissionsFor(user).has('SEND_MESSAGES') && this.systemChannel.permissionsFor(user).has('READ_MESSAGES')) {
+        return this.systemChannel;
+    }
+
+    for (let i = 0; i < channels.length; i++) {
+        let channel = channels[i];
+
+        if (channel.type == 'text' && channel.permissionsFor(user).has('SEND_MESSAGES') && channel.permissionsFor(user).has('READ_MESSAGES')) {
+            return channel;
+        }
+    }
+
+    return undefined;
 });
 
 // Add typescript sourcemapping for stack traces

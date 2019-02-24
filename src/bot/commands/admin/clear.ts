@@ -3,7 +3,7 @@ import { Emoji } from '@bot/libraries/emoji';
 import { Message, TextChannel, Collection, Snowflake } from 'discord.js';
 
 const remarks = [
-    'Back to the better days.',
+    'Back to better times.',
     'Like they never happened.',
     'Not even a trace.',
     'That looks better.',

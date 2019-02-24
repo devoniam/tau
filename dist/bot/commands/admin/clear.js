@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
 const emoji_1 = require("@bot/libraries/emoji");
 const remarks = [
-    'Back to the better days.',
+    'Back to better times.',
     'Like they never happened.',
     'Not even a trace.',
     'That looks better.',

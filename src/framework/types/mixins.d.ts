@@ -9,6 +9,11 @@ declare module 'discord.js' {
          * check that it is loaded (by checking for existence).
          */
         settings: GuildBucket;
+
+        /**
+         * Returns the guild's default text channel. This one isn't deprecated. ;)
+         */
+        getDefaultChannel(): TextChannel;
     }
 
     export interface GuildMember {
