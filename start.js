@@ -4,6 +4,8 @@ const fs = require('fs');
 // Add lodash as a global variable (see /src/framework/types/global.d.ts)
 global._ = require('lodash');
 
+// Add pub and tmp global functions
+
 global.pub = function(p) {
     return path.join(__dirname, 'public', p);
 };
@@ -12,12 +14,22 @@ global.tmp = function(p) {
     return path.join(__dirname, p);
 };
 
+// Add to string prototype
+
 String.prototype.equalsIgnoreCase = (function(o) {
     return o.toLowerCase() == this.toLowerCase();
 });
 
 String.prototype.equals = (function(o) {
     return o == this;
+});
+
+// Add to message prototype
+const { Message } = require('discord.js');
+Message.prototype.deleteAfter = (function(ms) {
+    setTimeout(() => {
+        this.delete().catch(err => {});
+    }, ms);
 });
 
 // Add typescript sourcemapping for stack traces

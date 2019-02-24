@@ -43,7 +43,7 @@ class Clear extends _api_1.Command {
         let originalSize = messagesToDelete.length;
         if (messagesToDelete.length == 0) {
             await message.edit(`${emoji_1.Emoji.ERROR}  No messages left to delete.`);
-            setTimeout(message.delete.bind(message), 5000);
+            message.deleteAfter(5000);
             return;
         }
         await message.edit(`${emoji_1.Emoji.LOADING}  Clearing ${messagesToDelete.length} messages (0%)...`);
@@ -57,7 +57,7 @@ class Clear extends _api_1.Command {
             }
         }
         await message.edit(`${emoji_1.Emoji.SUCCESS}  Cleared ${originalSize} messages. ${_.sample(remarks)}`);
-        setTimeout(message.delete.bind(message), 5000);
+        message.deleteAfter(5000);
     }
     async getMessages(channel, limit, before) {
         let results = [];

@@ -44,7 +44,7 @@ export class Clear extends Command {
         // Handle cases where all of the messages are older than two weeks
         if (messagesToDelete.length == 0) {
             await message.edit(`${Emoji.ERROR}  No messages left to delete.`);
-            setTimeout(message.delete.bind(message), 5000);
+            message.deleteAfter(5000);
             return;
         }
 
@@ -67,7 +67,7 @@ export class Clear extends Command {
         }
 
         await message.edit(`${Emoji.SUCCESS}  Cleared ${originalSize} messages. ${_.sample(remarks)}`);
-        setTimeout(message.delete.bind(message), 5000);
+        message.deleteAfter(5000);
     }
 
     /**
