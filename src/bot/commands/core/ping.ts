@@ -10,9 +10,8 @@ export class Ping extends Command {
     }
 
     execute(input: Input) {
-        //input.channel.send('Not yet implemented.');
-        let pingValue = Framework.getClient().ping;
-        pingValue = Number(pingValue.toPrecision(4));
-        input.channel.send(":satellite: Bot's last ping to server was **" + pingValue + " ms.**");
+        let ping = Framework.getClient().ping.toPrecision(4);
+
+        input.channel.send(`:satellite:  Bot's current ping is **${ping} ms**.`);
     }
 }
