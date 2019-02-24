@@ -4,6 +4,7 @@ import { GuildMember } from "discord.js";
 import { Role } from "discord.js";
 import { Argument } from "./argument";
 import { Guild } from "discord.js";
+import { MemberBucket } from "@core/lib/database/member";
 
 export class Parser {
     private command: Command;
@@ -200,6 +201,22 @@ export class Parser {
         });
 
         return compiled;
+    }
+
+    /**
+     * Resolves guild members in the parser, and ensures their settings are loaded.
+     */
+    public async resolve() {
+        for (let i = 0; i < this.parsedArguments.length; i++) {
+            let arg = this.parsedArguments[i];
+
+            if (arg.parsedValue && arg.parsedValue instanceof GuildMember) {
+                if (!arg.parsedValue.settings) {
+                    arg.parsedValue.settings = new MemberBucket(arg.parsedValue.id, arg.parsedValue.guild.id);
+                    await arg.parsedValue.settings.load();
+                }
+            }
+        }
     }
 }
 

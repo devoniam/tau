@@ -263,6 +263,7 @@ class Framework {
                 await member.settings.load();
             }
             let input = new input_1.Input(message);
+            await input.wait();
             let command = input.getCommand();
             if (command) {
                 if (input.isProper()) {

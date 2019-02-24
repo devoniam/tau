@@ -17,6 +17,7 @@ export class Input {
     private compatible: boolean = true;
 
     private error: Error|undefined;
+    private resolver: Promise<void> | undefined;
 
     constructor(message: Message) {
         // Extract basic message properties
@@ -48,6 +49,7 @@ export class Input {
 
         // Create the parser
         let parser = new Parser(this.command as Command, this.message, this.text);
+        this.resolver = parser.resolve();
 
         // Check for errors
         this.error = parser.getError();
@@ -60,6 +62,15 @@ export class Input {
                 value: parsed.parsedValue
             });
         });
+    }
+
+    /**
+     * Waits for the input to be ready. Used internally.
+     */
+    public async wait() {
+        if (this.resolver) {
+            await this.resolver;
+        }
     }
 
     /**

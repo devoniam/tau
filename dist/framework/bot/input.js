@@ -24,6 +24,7 @@ class Input {
         if (!(this.command = Framework.findCommand(this.commandName)))
             return;
         let parser = new parser_1.Parser(this.command, this.message, this.text);
+        this.resolver = parser.resolve();
         this.error = parser.getError();
         this.compatible = (this.error == undefined);
         _.forEach(parser.getArguments(), parsed => {
@@ -32,6 +33,11 @@ class Input {
                 value: parsed.parsedValue
             });
         });
+    }
+    async wait() {
+        if (this.resolver) {
+            await this.resolver;
+        }
     }
     getCommandName() {
         return this.commandName;

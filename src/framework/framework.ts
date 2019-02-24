@@ -385,6 +385,7 @@ export class Framework {
 
             // Parse the input
             let input = new Input(message);
+            await input.wait();
 
             // Find a matching command
             let command = input.getCommand();

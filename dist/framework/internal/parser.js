@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const member_1 = require("@core/lib/database/member");
 class Parser {
     constructor(command, message, content) {
         this.compiledArguments = [];
@@ -127,6 +129,17 @@ class Parser {
             });
         });
         return compiled;
+    }
+    async resolve() {
+        for (let i = 0; i < this.parsedArguments.length; i++) {
+            let arg = this.parsedArguments[i];
+            if (arg.parsedValue && arg.parsedValue instanceof discord_js_1.GuildMember) {
+                if (!arg.parsedValue.settings) {
+                    arg.parsedValue.settings = new member_1.MemberBucket(arg.parsedValue.id, arg.parsedValue.guild.id);
+                    await arg.parsedValue.settings.load();
+                }
+            }
+        }
     }
 }
 exports.Parser = Parser;
