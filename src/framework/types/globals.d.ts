@@ -13,6 +13,11 @@ declare global {
      */
     function tmp(path: string): string;
 
+    /**
+     * Returns a promise which resolves after the specified number of milliseconds.
+     */
+    function sleep(ms: number): Promise<void>;
+
     interface String {
         equals(other: string) : boolean;
         equalsIgnoreCase(other: string) : boolean;

@@ -4,7 +4,7 @@ const fs = require('fs');
 // Add lodash as a global variable (see /src/framework/types/global.d.ts)
 global._ = require('lodash');
 
-// Add pub and tmp global functions
+// Add pub, tmp, and sleep global functions
 
 global.pub = function(p) {
     return path.join(__dirname, 'public', p);
@@ -12,6 +12,12 @@ global.pub = function(p) {
 
 global.tmp = function(p) {
     return path.join(__dirname, p);
+};
+
+global.sleep = function(t) {
+    return new Promise(resolve => {
+        setTimeout(resolve, t);
+    });
 };
 
 // Add to string prototype
