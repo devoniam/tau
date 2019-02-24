@@ -3,8 +3,13 @@ const fs = require('fs');
 
 // Add lodash as a global variable (see /src/framework/types/global.d.ts)
 global._ = require('lodash');
+
 global.pub = function(p) {
     return path.join(__dirname, 'public', p);
+};
+
+global.tmp = function(p) {
+    return path.join(__dirname, p);
 };
 
 String.prototype.equalsIgnoreCase = (function(o) {
