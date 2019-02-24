@@ -19,7 +19,7 @@ class Level extends _api_1.Command {
     }
     async execute(input) {
         let user = input.getArgument('user');
-        let goal = await experience_1.Experience.getExperienceGoal(user);
+        let goal = await experience_1.Experience.getExperienceGoal(user) - user.settings.experience;
         input.channel.send(`:sparkles:  ${user} is level **${user.settings.level}** and needs **${goal}** more points to level up.`);
     }
 }

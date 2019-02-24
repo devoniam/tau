@@ -20,7 +20,7 @@ export class Level extends Command {
 
     async execute(input: Input) {
         let user = input.getArgument('user') as GuildMember;
-        let goal = await Experience.getExperienceGoal(user);
+        let goal = await Experience.getExperienceGoal(user) - user.settings.experience;
 
         input.channel.send(`:sparkles:  ${user} is level **${user.settings.level}** and needs **${goal}** more points to level up.`);
     }
