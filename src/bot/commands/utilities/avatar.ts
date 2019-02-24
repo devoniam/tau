@@ -1,5 +1,8 @@
 import { Command, Input } from '@api';
 import { GuildMember } from 'discord.js';
+import * as request from 'request';
+import { Emoji } from '@bot/libraries/emoji';
+import { Message } from 'discord.js';
 
 export class Avatar extends Command {
     constructor() {
@@ -17,9 +20,28 @@ export class Avatar extends Command {
         });
     }
 
-    execute(input: Input) {
+    async execute(input: Input) {
         let user = input.getArgument('user') as GuildMember;
+        let promise : Promise<Buffer> = new Promise((resolve, reject) => {
+            request(user.user.avatarURL, { encoding: null}, function(err, response, buffer) {
+                if (err) return reject(err);
+                resolve(buffer);
+            });
+        });
 
-        input.channel.send('Not yet implemented.');
+        // Post a loading message
+        let message = await input.channel.send(`${Emoji.LOADING}  Retrieving avatar...`) as Message;
+
+        // Get the buffer
+        try {
+            input.channel.send({
+                file: await promise
+            });
+            await message.delete();
+        }
+        catch (err) {
+            await message.edit(`${Emoji.ERROR}  Failed to download avatar, try again in a few moments.`);
+            message.deleteAfter(6000);
+        }
     }
 }
