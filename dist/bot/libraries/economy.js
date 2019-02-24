@@ -43,6 +43,8 @@ class Economy {
         let balances = [];
         for (let i = 0; i < members.length; i++) {
             let member = members[i];
+            if (member.user.bot)
+                continue;
             await this.load(member);
             balances.push({
                 member: member,

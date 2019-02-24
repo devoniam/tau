@@ -53,6 +53,8 @@ class Experience {
         let levels = [];
         for (let i = 0; i < members.length; i++) {
             let member = members[i];
+            if (member.user.bot)
+                continue;
             await this.load(member);
             levels.push({
                 member: member,

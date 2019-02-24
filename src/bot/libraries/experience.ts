@@ -105,6 +105,9 @@ export class Experience {
         for (let i = 0; i < members.length; i++) {
             let member = members[i];
 
+            // Skip bots
+            if (member.user.bot) continue;
+
             // Make sure they have data loaded
             await this.load(member);
 
