@@ -14,6 +14,11 @@ declare module 'discord.js' {
          * Returns the guild's default text channel. This one isn't deprecated. ;)
          */
         getDefaultChannel(): TextChannel;
+
+        /**
+         * Loads the settings bucket of the guild if not already loaded.
+         */
+        load(): Promise<void>;
     }
 
     export interface GuildMember {
@@ -23,6 +28,11 @@ declare module 'discord.js' {
          * check that it is loaded (by checking for existence).
          */
         settings: MemberBucket;
+
+        /**
+         * Loads the settings bucket of the member if not already loaded.
+         */
+        load(): Promise<void>;
     }
 
     export interface Message {

@@ -36,7 +36,10 @@ export class Listener {
         client.on('guildBanRemove', this.onGuildBanRemove.bind(this));
         client.on('guildCreate', this.onGuildCreate.bind(this));
         client.on('guildDelete', this.onGuildDelete.bind(this));
-        client.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
+        client.on('guildMemberAdd', async (member: GuildMember) => {
+            await member.load();
+            this.onGuildMemberAdd(member);
+        });
         client.on('guildMemberAvailable', this.onGuildMemberAvailable.bind(this));
         client.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
         client.on('guildMembersChunk', this.onGuildMembersChunk.bind(this));
@@ -44,7 +47,10 @@ export class Listener {
         client.on('guildMemberUpdate', this.onGuildMemberUpdate.bind(this));
         client.on('guildUnavailable', this.onGuildUnavailable.bind(this));
         client.on('guildUpdate', this.onGuildUpdate.bind(this));
-        client.on('message', this.onMessage.bind(this));
+        client.on('message', async (message: Message) => {
+            await message.member.load();
+            this.onMessage(message);
+        });
         client.on('messageDelete', this.onMessageDelete.bind(this));
         client.on('messageDeleteBulk', this.onMessageDeleteBulk.bind(this));
         client.on('messageReactionAdd', this.onMessageReactionAdd.bind(this));

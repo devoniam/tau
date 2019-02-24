@@ -369,8 +369,7 @@ export class Framework {
 
             // Load guild settings
             if (!guild.settings) {
-                guild.settings = new GuildBucket(guild.id);
-                await guild.settings.load();
+                await guild.load();
             }
 
             // Skip bots and non-commands
@@ -379,8 +378,7 @@ export class Framework {
 
             // Load member settings
             if (!member.settings) {
-                member.settings = new MemberBucket(guild.id, member.id);
-                await member.settings.load();
+                await member.load();
             }
 
             // Parse the input

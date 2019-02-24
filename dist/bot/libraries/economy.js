@@ -1,19 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const member_1 = require("@core/lib/database/member");
 class Economy {
     static async getBalance(member) {
-        await this.load(member);
+        await member.load();
         return member.settings.currency;
     }
     static async setBalance(member, amount) {
-        await this.load(member);
+        await member.load();
         member.settings.currency = amount;
         await member.settings.save();
         return amount;
     }
     static async addBalance(member, amount, announceChannel) {
-        await this.load(member);
+        await member.load();
         member.settings.currency += amount;
         await member.settings.save();
         if (announceChannel)
@@ -21,7 +20,7 @@ class Economy {
         return member.settings.currency;
     }
     static async removeBalance(member, amount, announceChannel) {
-        await this.load(member);
+        await member.load();
         member.settings.currency -= amount;
         await member.settings.save();
         if (announceChannel)
@@ -29,13 +28,13 @@ class Economy {
         return member.settings.currency;
     }
     static async awardRandomBalance(member, min, max) {
-        await this.load(member);
+        await member.load();
         member.settings.currency -= _.random(min, max);
         await member.settings.save();
         return member.settings.currency;
     }
     static async hasBalance(member, min) {
-        await this.load(member);
+        await member.load();
         return member.settings.currency >= min;
     }
     static async getAllBalances(guild) {
@@ -45,19 +44,13 @@ class Economy {
             let member = members[i];
             if (member.user.bot)
                 continue;
-            await this.load(member);
+            await member.load();
             balances.push({
                 member: member,
                 balance: member.settings.currency
             });
         }
         return _.orderBy(balances, 'balance', 'desc');
-    }
-    static async load(member) {
-        if (!member.settings) {
-            member.settings = new member_1.MemberBucket(member.guild.id, member.id);
-            await member.settings.load();
-        }
     }
 }
 exports.Economy = Economy;

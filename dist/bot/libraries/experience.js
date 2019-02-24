@@ -1,17 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const member_1 = require("@core/lib/database/member");
 class Experience {
     static async getExperience(member) {
-        await this.load(member);
+        await member.load();
         return member.settings.experience;
     }
     static async getLevel(member) {
-        await this.load(member);
+        await member.load();
         return member.settings.level;
     }
     static async addExperience(member, amount, announceChannel) {
-        await this.load(member);
+        await member.load();
         member.settings.experience += amount;
         await this.level(member, announceChannel);
         await member.settings.save();
@@ -21,7 +20,7 @@ class Experience {
         return await this.addExperience(member, _.random(min, max), announceChannel);
     }
     static async getExperienceGoal(member) {
-        await this.load(member);
+        await member.load();
         if (member.settings.level === 1)
             return 50;
         if (member.settings.level === 2)
@@ -55,7 +54,7 @@ class Experience {
             let member = members[i];
             if (member.user.bot)
                 continue;
-            await this.load(member);
+            await member.load();
             levels.push({
                 member: member,
                 level: member.settings.level,
@@ -67,12 +66,6 @@ class Experience {
         levels = _.orderBy(levels, ['level', 'experience'], ['desc', 'desc']);
         levels.forEach((level, i) => { level.rank = i + 1; });
         return levels;
-    }
-    static async load(member) {
-        if (!member.settings) {
-            member.settings = new member_1.MemberBucket(member.guild.id, member.id);
-            await member.settings.load();
-        }
     }
 }
 exports.Experience = Experience;

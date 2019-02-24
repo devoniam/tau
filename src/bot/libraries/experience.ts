@@ -1,6 +1,4 @@
-import { Database } from "@api";
 import { GuildMember } from "discord.js";
-import { MemberBucket } from "@core/lib/database/member";
 import { TextChannel } from "discord.js";
 import { Guild } from "discord.js";
 import { Channel } from "discord.js";
@@ -11,7 +9,7 @@ export class Experience {
      * Returns the experience points of a guild member.
      */
     public static async getExperience(member: GuildMember) : Promise<number> {
-        await this.load(member);
+        await member.load();
         return member.settings.experience;
     }
 
@@ -19,7 +17,7 @@ export class Experience {
      * Returns the level of a guild member.
      */
     public static async getLevel(member: GuildMember) : Promise<number> {
-        await this.load(member);
+        await member.load();
         return member.settings.level;
     }
 
@@ -28,7 +26,7 @@ export class Experience {
      * will be notified of levelup in that channel. Otherwise, the default is used.
      */
     public static async addExperience(member: GuildMember, amount: number, announceChannel?: Channel) : Promise<number> {
-        await this.load(member);
+        await member.load();
 
         // Add the experience
         member.settings.experience += amount;
@@ -55,7 +53,7 @@ export class Experience {
      * Returns the experience goal for the guild member.
      */
     public static async getExperienceGoal(member: GuildMember) : Promise<number> {
-        await this.load(member);
+        await member.load();
 
         if (member.settings.level === 1) return 50;
         if (member.settings.level === 2) return 100;
@@ -109,7 +107,7 @@ export class Experience {
             if (member.user.bot) continue;
 
             // Make sure they have data loaded
-            await this.load(member);
+            await member.load();
 
             // Push them
             levels.push({
@@ -125,16 +123,6 @@ export class Experience {
         levels.forEach((level, i) => { level.rank = i + 1; });
 
         return levels;
-    }
-
-    /**
-     * Loads the member and ensures their `settings` object is set.
-     */
-    private static async load(member: GuildMember) {
-        if (!member.settings) {
-            member.settings = new MemberBucket(member.guild.id, member.id);
-            await member.settings.load();
-        }
     }
 
 }

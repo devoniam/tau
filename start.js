@@ -32,7 +32,7 @@ String.prototype.equals = (function(o) {
 
 // Add to message and guild prototypes
 
-const { Message, Guild } = require('discord.js');
+const { Message, Guild, GuildMember } = require('discord.js');
 
 Message.prototype.deleteAfter = (function(ms) {
     setTimeout(() => {
@@ -57,6 +57,22 @@ Guild.prototype.getDefaultChannel = (function() {
     }
 
     return undefined;
+});
+
+Guild.prototype.load = (async function() {
+    if (!this.settings) {
+        let { GuildBucket } = require('@libraries/database/guild');
+        this.settings = new GuildBucket(this.id);
+        await this.settings.load();
+    }
+});
+
+GuildMember.prototype.load = (async function() {
+    if (!this.settings) {
+        let { MemberBucket } = require('@libraries/database/member');
+        this.settings = new MemberBucket(this.id, this.guild.id);
+        await this.settings.load();
+    }
 });
 
 // Add typescript sourcemapping for stack traces

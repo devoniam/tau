@@ -9,8 +9,6 @@ const readline = require("readline");
 const command_1 = require("./bot/command");
 const listener_1 = require("./bot/listener");
 const job_1 = require("./bot/job");
-const member_1 = require("./lib/database/member");
-const guild_1 = require("./lib/database/guild");
 const input_1 = require("./bot/input");
 const emoji_1 = require("@bot/libraries/emoji");
 const server_1 = require("./internal/server");
@@ -251,16 +249,14 @@ class Framework {
             let member = message.member;
             let guild = message.guild;
             if (!guild.settings) {
-                guild.settings = new guild_1.GuildBucket(guild.id);
-                await guild.settings.load();
+                await guild.load();
             }
             if (!message.content.startsWith(guild.settings.prefix))
                 return;
             if (member.user.bot)
                 return;
             if (!member.settings) {
-                member.settings = new member_1.MemberBucket(guild.id, member.id);
-                await member.settings.load();
+                await member.load();
             }
             let input = new input_1.Input(message);
             await input.wait();
