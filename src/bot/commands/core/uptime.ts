@@ -1,4 +1,6 @@
 import { Command, Input } from '@api';
+import { Framework } from '@core/framework';
+import * as moment from 'moment';
 
 export class Uptime extends Command {
     constructor() {
@@ -9,6 +11,10 @@ export class Uptime extends Command {
     }
 
     execute(input: Input) {
-        input.channel.send('Not yet implemented.');
+        let onlineSince = _.now() - Framework.getClient().uptime;
+        let m = moment(onlineSince);
+        let online = m.fromNow(true);
+
+        input.channel.send(`:clock4:  Bot has been running for **${online}**.`);
     }
 }
