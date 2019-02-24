@@ -79,16 +79,20 @@ export class Experience {
         let channel = announceChannel || member.guild.getDefaultChannel();
         let goal = await this.getExperienceGoal(member);
         let changed = false;
+        let earned = 0;
 
         while (member.settings.experience >= goal) {
             member.settings.experience -= goal;
             member.settings.level++;
+            member.settings.currency += 25;
+
             goal = await this.getExperienceGoal(member);
             changed = true;
+            earned += 25;
         }
 
         if (changed) {
-            await (<TextChannel>channel).send(`:sparkles:  **Level up!** ${member} is now level **${member.settings.level}**.`);
+            await (<TextChannel>channel).send(`:sparkles:  **Level up!** ${member} is now level ${member.settings.level}.  :moneybag:  **+$${earned.toFixed(2)}**`);
         }
     }
 
