@@ -1,4 +1,6 @@
 import { Command, Input } from '@api';
+import { Experience } from '@bot/libraries/experience';
+const Table = require('easy-utf8-table');
 
 export class Leaderboard extends Command {
     constructor() {
@@ -19,9 +21,22 @@ export class Leaderboard extends Command {
         });
     }
 
-    execute(input: Input) {
+    async execute(input: Input) {
         let limit = input.getArgument('limit') as number;
+        let rows = await Experience.getAllLevels(input.guild);
+        let display = _.slice(rows, 0, limit);
 
-        input.channel.send('Not yet implemented.');
+        let table = new Table();
+
+        display.forEach(row => {
+            table.cell('#', row.rank);
+            table.cell('Member', row.member.displayName);
+            table.cell('Level', row.level);
+            table.cell('Experience', row.experience);
+            table.cell('Next level in', row.experienceGoal - row.experience);
+            table.newRow();
+        });
+
+        input.channel.send('```\n' + table + '\n```');
     }
 }
