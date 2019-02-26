@@ -23,24 +23,45 @@ class Listener {
         client.on('error', this.onError.bind(this));
         client.on('guildBanAdd', this.onGuildBanAdd.bind(this));
         client.on('guildBanRemove', this.onGuildBanRemove.bind(this));
-        client.on('guildCreate', this.onGuildCreate.bind(this));
-        client.on('guildDelete', this.onGuildDelete.bind(this));
+        client.on('guildCreate', async (guild) => {
+            await guild.load();
+            await this.run(this.onGuildCreate(guild));
+        });
+        client.on('guildDelete', async (guild) => {
+            await guild.load();
+            await this.run(this.onGuildDelete(guild));
+        });
         client.on('guildMemberAdd', async (member) => {
             await member.load();
-            this.onGuildMemberAdd(member);
+            await this.run(this.onGuildMemberAdd(member));
         });
-        client.on('guildMemberAvailable', this.onGuildMemberAvailable.bind(this));
-        client.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
+        client.on('guildMemberAvailable', async (member) => {
+            await member.load();
+            await this.run(this.onGuildMemberAvailable(member));
+        });
+        client.on('guildMemberRemove', async (member) => {
+            await member.load();
+            await this.run(this.onGuildMemberRemove(member));
+        });
+        client.on('guildMemberUpdate', async (om, nm) => {
+            await om.load();
+            await nm.load();
+            await this.run(this.onGuildMemberUpdate(om, nm));
+        });
         client.on('guildMembersChunk', this.onGuildMembersChunk.bind(this));
         client.on('guildMemberSpeaking', this.onGuildMemberSpeaking.bind(this));
-        client.on('guildMemberUpdate', this.onGuildMemberUpdate.bind(this));
         client.on('guildUnavailable', this.onGuildUnavailable.bind(this));
         client.on('guildUpdate', this.onGuildUpdate.bind(this));
         client.on('message', async (message) => {
             await message.member.load();
-            this.onMessage(message);
+            await message.guild.load();
+            await this.run(this.onMessage(message));
         });
-        client.on('messageDelete', this.onMessageDelete.bind(this));
+        client.on('messageDelete', async (message) => {
+            await message.member.load();
+            await message.guild.load();
+            await this.run(this.onMessageDelete(message));
+        });
         client.on('messageDeleteBulk', this.onMessageDeleteBulk.bind(this));
         client.on('messageReactionAdd', this.onMessageReactionAdd.bind(this));
         client.on('messageReactionRemove', this.onMessageReactionRemove.bind(this));
@@ -56,6 +77,13 @@ class Listener {
         client.on('userUpdate', this.onUserUpdate.bind(this));
         client.on('voiceStateUpdate', this.onVoiceStateUpdate.bind(this));
         client.on('warn', this.onWarn.bind(this));
+    }
+    async run(r) {
+        if (Promise.resolve(r) == r) {
+            r.catch(err => {
+                console.log(err);
+            });
+        }
     }
     onChannelCreate(channel) { }
     onChannelDelete(channel) { }
