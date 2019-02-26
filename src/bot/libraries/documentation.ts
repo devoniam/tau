@@ -58,4 +58,15 @@ export class Documentation {
         return `${usage} ${args.join(' ')}`.trim();
     }
 
+    /**
+     * Returns a string with the full detailed help information for a command.
+     */
+    public static getCommandHelp(command: Command) {
+        let help = Documentation.getCommandOverview(command);
+        help += '\n\n';
+        help += Documentation.getArgumentDetails(command);
+
+        return help;
+    }
+
 }
