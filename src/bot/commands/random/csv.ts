@@ -13,15 +13,32 @@ export class CSV extends Command {
                     expand: true,
                     required: true,
                     eval: (input : string) => input.indexOf(',') > 0
+                },
+                {
+                    name: 'amount',
+                    description: 'Amount of entries to retrieve.',
+                    expand: true,
+                    required: false,
+                    default: 1
                 }
+
             ]
         });
     }
 
     execute(input: Input) {
         let list = input.getArgument('list') as string;
-        let entries = list.split(/\s*,\s*/);
+        let amount = input.getArgument('amount') as number;
+        let entries = list.split(/\s*,+\s*/);
+        let elements = [];
 
-        input.channel.send('Not yet implemented.');
+
+        //Display the selected amount of list items
+        if (amount > 0) {
+            for (let i = 0; i < amount; i++) {
+                elements[i] = entries[Math.floor(Math.random() * entries.length)];
+            }
+            input.channel.send(elements.join(', '));
+        }
     }
 }
