@@ -17,6 +17,7 @@ import { Server } from './internal/server';
 import { Database } from './lib/database';
 
 import chalk from 'chalk';
+import { Documentation } from '@bot/libraries/documentation';
 
 export class Framework {
     private static config: BotConfiguration;
@@ -390,7 +391,10 @@ export class Framework {
 
             // Run the command
             if (command) {
-                if (input.isProper()) {
+                if (input.isRequestingHelp()) {
+                    input.channel.send(Documentation.getCommandHelp(command));
+                }
+                else if (input.isProper()) {
                     let commandName = command.getName();
 
                     // Only show the server name on production
@@ -458,6 +462,13 @@ export class Framework {
         }
 
         return null;
+    }
+
+    /**
+     * Returns all running commands in the framework.
+     */
+    public static getCommands() : Command[] {
+        return this.commands;
     }
 }
 

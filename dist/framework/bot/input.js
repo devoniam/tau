@@ -66,6 +66,9 @@ class Input {
     isProper() {
         return this.compatible;
     }
+    isRequestingHelp() {
+        return (this.text.equalsIgnoreCase('help'));
+    }
     generateExpressions(arg) {
         if (arg.expand)
             return ['^(.+)$'];

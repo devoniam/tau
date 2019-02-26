@@ -31,6 +31,12 @@ class Documentation {
         });
         return `${usage} ${args.join(' ')}`.trim();
     }
+    static getCommandHelp(command) {
+        let help = Documentation.getCommandOverview(command);
+        help += '\n\n';
+        help += Documentation.getArgumentDetails(command);
+        return help;
+    }
 }
 exports.Documentation = Documentation;
 //# sourceMappingURL=documentation.js.map

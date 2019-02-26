@@ -14,6 +14,7 @@ const emoji_1 = require("@bot/libraries/emoji");
 const server_1 = require("./internal/server");
 const database_1 = require("./lib/database");
 const chalk_1 = require("chalk");
+const documentation_1 = require("@bot/libraries/documentation");
 class Framework {
     static start() {
         this.logger = new logger_1.Logger();
@@ -262,7 +263,10 @@ class Framework {
             await input.wait();
             let command = input.getCommand();
             if (command) {
-                if (input.isProper()) {
+                if (input.isRequestingHelp()) {
+                    input.channel.send(documentation_1.Documentation.getCommandHelp(command));
+                }
+                else if (input.isProper()) {
                     let commandName = command.getName();
                     let serverId = (this.getEnvironment() == 'production') ? `${chalk_1.default.gray(input.guild.name)}: ` : '';
                     try {
@@ -313,6 +317,9 @@ class Framework {
             }
         }
         return null;
+    }
+    static getCommands() {
+        return this.commands;
     }
 }
 Framework.commands = [];

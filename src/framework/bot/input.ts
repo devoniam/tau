@@ -133,6 +133,14 @@ export class Input {
     }
 
     /**
+     * Returns true if the user is requesting help for this command. This method is used internally, and if `true`,
+     * the command is never invoked.
+     */
+    public isRequestingHelp() : boolean {
+        return (this.text.equalsIgnoreCase('help'));
+    }
+
+    /**
      * Generates an array of expressions for the given argument.
      */
     private generateExpressions(arg: any) : string[] {
