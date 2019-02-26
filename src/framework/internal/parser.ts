@@ -170,7 +170,7 @@ export class Parser {
 
             if (evaluator) {
                 try {
-                    if (!evaluator(parsed.parsedValue, this.parsedArguments)) {
+                    if (!evaluator(parsed.parsedValue, this.parsedArguments, this.message as Message)) {
                         parsed.error = true;
                         parsed.errorMessage = parsed.argument.getErrorMessage() || `Please enter a valid ${parsed.name}.`;
                     }
