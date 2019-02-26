@@ -26,7 +26,7 @@ class Pay extends _api_1.Command {
                     constraint: 'number',
                     required: true,
                     eval: (input, args, message) => {
-                        if (input <= 0)
+                        if (input < 1)
                             return false;
                         return true;
                     }
@@ -37,6 +37,7 @@ class Pay extends _api_1.Command {
     async execute(input) {
         let user = input.getArgument('user');
         let amount = input.getArgument('amount');
+        amount = Math.floor(amount);
         if (amount > input.member.settings.currency) {
             await input.channel.send(`${emoji_1.Emoji.ERROR}  Insufficient funds. The most you can send is **$${input.member.settings.currency.toFixed(2)}**.`);
             return;

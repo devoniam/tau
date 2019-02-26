@@ -24,7 +24,7 @@ export class Pay extends Command {
                     constraint: 'number',
                     required: true,
                     eval: (input, args, message) => {
-                        if (input <= 0) return false;
+                        if (input < 1) return false;
                         return true;
                     }
                 }
@@ -36,16 +36,22 @@ export class Pay extends Command {
         let user = input.getArgument('user') as GuildMember;
         let amount = input.getArgument('amount') as number;
 
+        // Only send dollars
+        amount = Math.floor(amount);
+
+        // Reject if the balance is not enough
         if (amount > input.member.settings.currency) {
             await input.channel.send(`${Emoji.ERROR}  Insufficient funds. The most you can send is **$${input.member.settings.currency.toFixed(2)}**.`);
             return;
         }
 
+        // Wait for the transactions to complete
         await Promise.all([
             Economy.removeBalance(input.member, amount),
             Economy.addBalance(user, amount)
         ]);
 
+        // Receipt
         await input.channel.send(`${Emoji.SUCCESS}  Success! ${input.member} has sent **$${amount.toFixed(2)}** to ${user}.`);
     }
 }
