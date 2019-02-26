@@ -14,14 +14,28 @@ class CSV extends _api_1.Command {
                     expand: true,
                     required: true,
                     eval: (input) => input.indexOf(',') > 0
+                },
+                {
+                    name: 'amount',
+                    description: 'Amount of entries to retrieve.',
+                    expand: true,
+                    required: false,
+                    default: 1
                 }
             ]
         });
     }
     execute(input) {
         let list = input.getArgument('list');
-        let entries = list.split(/\s*,\s*/);
-        input.channel.send('Not yet implemented.');
+        let amount = input.getArgument('amount');
+        let entries = list.split(/\s*,+\s*/);
+        let elements = [];
+        if (amount > 0) {
+            for (let i = 0; i < amount; i++) {
+                elements[i] = entries[Math.floor(Math.random() * entries.length)];
+            }
+            input.channel.send(elements.join(', '));
+        }
     }
 }
 exports.CSV = CSV;
