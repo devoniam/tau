@@ -459,6 +459,13 @@ export class Framework {
 
         return null;
     }
+
+    /**
+     * Returns all running commands in the framework.
+     */
+    public static getCommands() : Command[] {
+        return this.commands;
+    }
 }
 
 type BotConfiguration = {

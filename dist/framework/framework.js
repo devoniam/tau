@@ -314,6 +314,9 @@ class Framework {
         }
         return null;
     }
+    static getCommands() {
+        return this.commands;
+    }
 }
 Framework.commands = [];
 exports.Framework = Framework;
