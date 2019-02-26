@@ -1,5 +1,6 @@
 import { Command, Input } from '@api';
 import * as request from 'request';
+import {Response} from 'request';
 
 let triviaCategories: string[] = [
     'All',
@@ -82,7 +83,7 @@ export class Trivia extends Command {
             }
         }
 
-        let databaseURL = request(openTDB + questionAmount + categoryURL + difficulty + type, (error, response, body) => {
+        let databaseURL = request(openTDB + questionAmount + categoryURL + difficulty + type, (error: any, response: Response, body: any) => {
             if (error) {
                 input.channel.send({
                     embed: {

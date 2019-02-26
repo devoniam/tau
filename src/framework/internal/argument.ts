@@ -3,7 +3,6 @@ import { GuildMember } from "discord.js";
 import { Role } from "discord.js";
 import { Guild } from "discord.js";
 import { ParsedArgument } from "./parser";
-import { Message } from "discord.js";
 
 export class Argument {
     private options : CommandArgument;
@@ -148,7 +147,7 @@ export class Argument {
      * **Note:** You can throw an `Error` from this function and the bot will respond with the error's message. This
      * can help provide contextual feedback to the user when giving an incorrect value.
      */
-    public getEvaluator() : ((input: any, args: ParsedArgument[], message: Message) => boolean) | undefined {
+    public getEvaluator() : ((input: any, args: ParsedArgument[]) => boolean) | undefined {
         return this.options.eval;
     }
 

@@ -38,7 +38,7 @@ export class Economy {
     }
 
     /**
-     * Removes from the balance of a guild member. Returns the new balance. If `announceChannel` is set, the user will be
+     * Adds to the balance of a guild member. Returns the new balance. If `announceChannel` is set, the user will be
      * notified of the balance change automatically.
      */
     public static async removeBalance(member: GuildMember, amount: number, announceChannel?: TextChannel) : Promise<number> {
