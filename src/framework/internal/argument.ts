@@ -122,9 +122,10 @@ export class Argument {
      */
     public getUsage() : string {
         let components : string[] = [];
+        let options = this.getOptions();
         components.push(this.getRequired() ? '<' : '[');
 
-        if (this.getOptions()) components.push((<string[]> this.getOptions()).join('|'));
+        if (options && options.length < 5) components.push((<string[]> this.getOptions()).join('|'));
         else if (_.isEqual(this.getConstraints(), ['mention'])) components.push('@' + this.getName());
         else components.push(this.getName());
 

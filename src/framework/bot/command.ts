@@ -3,6 +3,8 @@ import { Input } from '@core/api';
 import { Logger } from './logger';
 import { Argument } from '@core/internal/argument';
 import { ParsedArgument } from '@core/internal/parser';
+import { Documentation } from '@bot/libraries/documentation';
+import { Message } from 'discord.js';
 
 export abstract class Command {
     private logger: Logger;
@@ -125,14 +127,7 @@ export abstract class Command {
      * Returns usage for this command.
      */
     public getUsage() : string {
-        let usage = this.getName();
-        let args : string[] = [];
-
-        this.getArguments().forEach(arg => {
-            args.push(arg.getUsage());
-        });
-
-        return `${usage} ${args.join(' ')}`.trim();
+        return Documentation.getInlineUsage(this);
     }
 }
 
@@ -258,7 +253,7 @@ export type CommandArgument = {
      * **Note #2:** You can throw an `Error` from this function and the bot will respond with the error's message. This
      * can help provide contextual feedback to the user when giving an incorrect value.
      */
-    eval?: (input: any, args: ParsedArgument[]) => boolean;
+    eval?: (input: any, args: ParsedArgument[], message: Message) => boolean;
 
     /**
      * The message to display if this argument fails. If not specified, the command's usage string will be displayed.

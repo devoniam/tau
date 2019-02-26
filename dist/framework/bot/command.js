@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("./logger");
 const argument_1 = require("@core/internal/argument");
+const documentation_1 = require("@bot/libraries/documentation");
 class Command {
     constructor(options) {
         this.options = options;
@@ -76,12 +77,7 @@ class Command {
         }
     }
     getUsage() {
-        let usage = this.getName();
-        let args = [];
-        this.getArguments().forEach(arg => {
-            args.push(arg.getUsage());
-        });
-        return `${usage} ${args.join(' ')}`.trim();
+        return documentation_1.Documentation.getInlineUsage(this);
     }
 }
 exports.Command = Command;

@@ -59,8 +59,9 @@ class Argument {
     }
     getUsage() {
         let components = [];
+        let options = this.getOptions();
         components.push(this.getRequired() ? '<' : '[');
-        if (this.getOptions())
+        if (options && options.length < 5)
             components.push(this.getOptions().join('|'));
         else if (_.isEqual(this.getConstraints(), ['mention']))
             components.push('@' + this.getName());
