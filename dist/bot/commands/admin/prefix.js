@@ -12,7 +12,7 @@ class Prefix extends _api_1.Command {
                 {
                     name: 'char',
                     description: 'A new single character to use as the prefix.',
-                    options: ['!', '@', '#', '$', '%', '^', '&', '*', '<', '>', ',', '.', '/', '?', ':', ';', '|', '~', '`', '=', '+', '-'],
+                    options: ['!', '@', '#', '$', '%', '^', '&', '*', '<', '>', ',', '.', '/', '?', ':', ';', '|', '~', '=', '+', '-'],
                     usage: 'character',
                     required: true
                 }
