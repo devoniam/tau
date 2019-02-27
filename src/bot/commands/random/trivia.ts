@@ -113,12 +113,11 @@ export class Trivia extends Command {
                 });
             }
 
-
             //Retrieve trivia questions from database and fix any syntax issues that may have occured
-
             let parsed = JSON.parse(body) as TriviaResponse;
             let count = 0;
-
+            do {
+            let rnd = Math.floor(Math.random() * parsed.results.length);
             let question = unescape(parsed.results[count].question);
             let incorrect_answers: string[] = [];
             _.each(parsed.results[count].incorrect_answers, s => incorrect_answers.push(s));
@@ -126,7 +125,6 @@ export class Trivia extends Command {
             let answers = [correct_answer];
             incorrect_answers.forEach(element => { answers.push(element); });
 
-           // do {
 
                 //Randomize answers before displaying
                 for (let i = answers.length - 1; i > 0; i--) {
@@ -137,14 +135,14 @@ export class Trivia extends Command {
                 }
 
                 // console.log("Answers:" + answers);
-                // console.log('Type: ' + typeURL);
+                // console.log('Type: ' + parsed.results[0].type);
                 // console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
                 // console.log('results: ' + parsed.results);
                 // console.log('questions: ' + question);
                 // console.log('Category: ' + parsed.results[count].category);
 
 
-                if (typeURL == '&type=mutiple') {
+                if (parsed.results[count].type == 'multiple') {
                     input.channel.send({
                         embed:
                         {
@@ -190,8 +188,8 @@ export class Trivia extends Command {
                 }
             count++;
          //   const collector = (reaction, user)
-           // }
-           // while (count < 10)
+            }
+            while (count < 10)
         });
     }
 }
