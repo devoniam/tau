@@ -126,7 +126,7 @@ export class Trivia extends Command {
             let answers = [correct_answer];
             incorrect_answers.forEach(element => { answers.push(element); });
 
-            do {
+           // do {
 
                 //Randomize answers before displaying
                 for (let i = answers.length - 1; i > 0; i--) {
@@ -136,12 +136,12 @@ export class Trivia extends Command {
                     answers[e] = temp;
                 }
 
-                console.log("Answers:" + answers);
-                console.log('Type: ' + typeURL);
-                console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
-                console.log('results: ' + parsed.results);
-                console.log('questions: ' + question);
-                console.log('Category: ' + parsed.results[count].category);
+                // console.log("Answers:" + answers);
+                // console.log('Type: ' + typeURL);
+                // console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
+                // console.log('results: ' + parsed.results);
+                // console.log('questions: ' + question);
+                // console.log('Category: ' + parsed.results[count].category);
 
 
                 if (typeURL == '&type=mutiple') {
@@ -190,8 +190,8 @@ export class Trivia extends Command {
                 }
             count++;
          //   const collector = (reaction, user)
-            }
-            while (count < 10)
+           // }
+           // while (count < 10)
         });
     }
 }
