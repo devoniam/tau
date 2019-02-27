@@ -68,7 +68,7 @@ class Trivia extends _api_1.Command {
         let difficultyURL = '&difficulty=' + difficulty;
         let typeURL = '&type=' + type;
         let categoryURL = '';
-        let questionAmount = '?amount=1';
+        let questionAmount = '?amount=10';
         let openTDB = 'https://opentdb.com/api.php';
         if (!difficulty || difficulty == 'any' || difficulty == 'all') {
             difficultyURL = '';
@@ -95,71 +95,70 @@ class Trivia extends _api_1.Command {
                 });
             }
             let parsed = JSON.parse(body);
-            let rnd = Math.floor(Math.random() * parsed.results.length);
-            let question = unescape(parsed.results[rnd].question);
+            let count = 0;
+            let question = unescape(parsed.results[count].question);
             let incorrect_answers = [];
-            _.each(parsed.results[rnd].incorrect_answers, s => incorrect_answers.push(s));
-            let correct_answer = unescape(parsed.results[rnd].correct_answer);
+            _.each(parsed.results[count].incorrect_answers, s => incorrect_answers.push(s));
+            let correct_answer = unescape(parsed.results[count].correct_answer);
             let answers = [correct_answer];
             incorrect_answers.forEach(element => { answers.push(element); });
-            for (let i = answers.length - 1; i > 0; i--) {
-                let e = Math.floor(Math.random() * (i + 1));
-                let temp = answers[i];
-                answers[i] = answers[e];
-                answers[e] = temp;
-            }
-            console.log("Answers:" + answers);
-            console.log('Type: ' + typeURL);
-            console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
-            console.log('results: ' + parsed.results);
-            console.log('questions: ' + question);
-            console.log('Category: ' + parsed.results[rnd].category);
-            if (typeURL == '&type=mutiple') {
-                input.channel.send({
-                    embed: {
-                        color: 3447003,
-                        title: '__' + parsed.results[rnd].category + '__',
-                        description: question,
-                        fields: [
-                            {
-                                name: 'A)',
-                                value: answers[0]
-                            },
-                            {
-                                name: 'B)',
-                                value: answers[1]
-                            },
-                            {
-                                name: 'C)',
-                                value: answers[2]
-                            },
-                            {
-                                name: 'D)',
-                                value: answers[3]
-                            }
-                        ],
-                    }
-                });
-            }
-            else {
-                input.channel.send({
-                    embed: {
-                        color: 3447003,
-                        title: '__' + parsed.results[rnd].category + '__',
-                        description: question,
-                        fields: [
-                            {
-                                name: 'A)',
-                                value: answers[0]
-                            },
-                            {
-                                name: 'B)',
-                                value: answers[1]
-                            }
-                        ],
-                    }
-                });
-            }
+            do {
+                for (let i = answers.length - 1; i > 0; i--) {
+                    let e = Math.floor(Math.random() * (i + 1));
+                    let temp = answers[i];
+                    answers[i] = answers[e];
+                    answers[e] = temp;
+                }
+                console.log("Answers:" + answers);
+                console.log('Type: ' + typeURL);
+                console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
+                console.log('results: ' + parsed.results);
+                console.log('questions: ' + question);
+                console.log('Category: ' + parsed.results[count].category);
+                if (typeURL == '&type=mutiple') {
+                    input.channel.send({
+                        embed: {
+                            color: 3447003,
+                            title: '__' + parsed.results[count].category + '__',
+                            description: question,
+                            fields: [{
+                                    name: 'A)',
+                                    value: answers[0]
+                                },
+                                {
+                                    name: 'B)',
+                                    value: answers[1]
+                                },
+                                {
+                                    name: 'C)',
+                                    value: answers[2]
+                                },
+                                {
+                                    name: 'D)',
+                                    value: answers[3]
+                                }],
+                        }
+                    });
+                }
+                else {
+                    input.channel.send({
+                        embed: {
+                            color: 3447003,
+                            title: '__' + parsed.results[count].category + '__',
+                            description: question,
+                            fields: [{
+                                    name: 'A)',
+                                    value: answers[0]
+                                },
+                                {
+                                    name: 'B)',
+                                    value: answers[1]
+                                }],
+                        }
+                    });
+                }
+                count++;
+            } while (count < 10);
         });
     }
 }

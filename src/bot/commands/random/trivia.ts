@@ -31,6 +31,16 @@ let triviaCategories: string[] = [
     'Cartoons'
 ]
 
+//TODO: Decide whether Trivia should be multiplayer or single player
+//TODO: Make the trivia questions run on a loop that waits for player(s) to answer.
+//TODO: Once player(s) have submitted, the bot displays the correct answer and gives points to the plyer(s) that got it right
+//TODO: Add Stop command
+//TODO: Create a reaction collector
+
+//------------------[Maybe]-------------------- 
+//TODO: Add Trivia join command. 
+//TODO: Add Amount command
+
 export class Trivia extends Command {
     constructor() {
         super({
@@ -74,10 +84,12 @@ export class Trivia extends Command {
         let category = input.getArgument('category');
         let difficulty = input.getArgument('difficulty');
         let type = input.getArgument('type');
+
+        //Translate user input into URLS for the datase
         let difficultyURL: string = '&difficulty=' + difficulty;
         let typeURL: string = '&type=' + type;
         let categoryURL: string = '';
-        let questionAmount = '?amount=1';
+        let questionAmount = '?amount=10';
         let openTDB = 'https://opentdb.com/api.php';
 
         if (!difficulty || difficulty == 'any' || difficulty == 'all') { difficultyURL = ''; }
@@ -89,7 +101,7 @@ export class Trivia extends Command {
                 categoryURL = '&category=' + (8 + triviaCategories.indexOf(i)).toString();
             }
         }
-
+        //URL to pull trivia questions from
         let databaseURL = request(openTDB + questionAmount + categoryURL + difficultyURL + typeURL, (error: any, response: Response, body: any) => {
             if (error) {
                 input.channel.send({
@@ -101,38 +113,45 @@ export class Trivia extends Command {
                 });
             }
 
+
+            //Retrieve trivia questions from database and fix any syntax issues that may have occured
+
             let parsed = JSON.parse(body) as TriviaResponse;
-            let rnd = Math.floor(Math.random() * parsed.results.length);
-            let question = unescape(parsed.results[rnd].question);
+            let count = 0;
+
+            let question = unescape(parsed.results[count].question);
             let incorrect_answers: string[] = [];
-            _.each(parsed.results[rnd].incorrect_answers, s => incorrect_answers.push(s));
-            let correct_answer = unescape(parsed.results[rnd].correct_answer);
+            _.each(parsed.results[count].incorrect_answers, s => incorrect_answers.push(s));
+            let correct_answer = unescape(parsed.results[count].correct_answer);
             let answers = [correct_answer];
             incorrect_answers.forEach(element => { answers.push(element); });
 
-            for (let i = answers.length - 1; i > 0; i--) {
-                let e = Math.floor(Math.random() * (i + 1));
-                let temp = answers[i];
-                answers[i] = answers[e];
-                answers[e] = temp;
-            }
+            do {
 
-            console.log("Answers:" + answers);
-            console.log('Type: ' + typeURL);
-            console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
-            console.log('results: ' + parsed.results);
-            console.log('questions: ' + question);
-            console.log('Category: ' + parsed.results[rnd].category);
+                //Randomize answers before displaying
+                for (let i = answers.length - 1; i > 0; i--) {
+                    let e = Math.floor(Math.random() * (i + 1));
+                    let temp = answers[i];
+                    answers[i] = answers[e];
+                    answers[e] = temp;
+                }
 
-            if (typeURL == '&type=mutiple') {
-                input.channel.send({
-                    embed:
-                    {
-                        color: 3447003,
-                        title: '__' + parsed.results[rnd].category + '__',
-                        description: question,
-                        fields: [
-                            {
+                console.log("Answers:" + answers);
+                console.log('Type: ' + typeURL);
+                console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
+                console.log('results: ' + parsed.results);
+                console.log('questions: ' + question);
+                console.log('Category: ' + parsed.results[count].category);
+
+
+                if (typeURL == '&type=mutiple') {
+                    input.channel.send({
+                        embed:
+                        {
+                            color: 3447003,
+                            title: '__' + parsed.results[count].category + '__',
+                            description: question,
+                            fields: [{
                                 name: 'A)',
                                 value: answers[0]
                             },
@@ -147,31 +166,32 @@ export class Trivia extends Command {
                             {
                                 name: 'D)',
                                 value: answers[3]
-                            }
-                        ],
-                    }
-                });
-            }
-            else {
-                input.channel.send({
-                    embed:
-                    {
-                        color: 3447003,
-                        title: '__' + parsed.results[rnd].category + '__',
-                        description: question,
-                        fields: [
-                            {
+                            }],
+                        }
+                    });
+                }
+                else {
+                    input.channel.send({
+                        embed:
+                        {
+                            color: 3447003,
+                            title: '__' + parsed.results[count].category + '__',
+                            description: question,
+                            fields: [{
                                 name: 'A)',
                                 value: answers[0]
                             },
                             {
                                 name: 'B)',
                                 value: answers[1]
-                            }
-                        ],
-                    }
-                });
+                            }],
+                        }
+                    });
+                }
+            count++;
+         //   const collector = (reaction, user)
             }
+            while (count < 10)
         });
     }
 }

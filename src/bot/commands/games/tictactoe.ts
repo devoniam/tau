@@ -94,7 +94,7 @@ export class TicTacToe extends Command {
     }
 
     /**
-     * Check is index of lobby is valid
+     * Check if index of lobby is valid
      *
      * @param lobbyNumber
      * @param lobbiesInServer
