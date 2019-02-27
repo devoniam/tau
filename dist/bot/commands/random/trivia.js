@@ -110,6 +110,12 @@ class Trivia extends _api_1.Command {
                     answers[i] = answers[e];
                     answers[e] = temp;
                 }
+                this.getLogger().debug("Answers:" + answers);
+                this.getLogger().debug('Type: ' + parsed.results[0].type);
+                this.getLogger().debug('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
+                this.getLogger().debug('results: ' + parsed.results);
+                this.getLogger().debug('questions: ' + question);
+                this.getLogger().debug('Category: ' + parsed.results[count].category);
                 if (parsed.results[count].type == 'multiple') {
                     input.channel.send({
                         embed: {
