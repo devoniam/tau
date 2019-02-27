@@ -5,7 +5,7 @@ class Noun extends _api_1.Command {
     constructor() {
         super({
             name: 'noun',
-            description: 'Returns a random noun.'
+            description: 'Displays a random noun.'
         });
     }
     execute(input) {

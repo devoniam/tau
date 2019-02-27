@@ -4,9 +4,11 @@ export class Verb extends Command {
     constructor() {
         super({
             name: 'verb',
-            description: 'Returns a random verb.'
+            description: 'Displays a random verb.'
         });
     }
+
+    //TODO: Allow users/admins to enter custom quotes
 
     execute(input: Input) {
 

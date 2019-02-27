@@ -4,9 +4,11 @@ export class Noun extends Command {
     constructor() {
         super({
             name: 'noun',
-            description: 'Returns a random noun.'
+            description: 'Displays a random noun.'
         });
     }
+
+    //TODO: Allow users/admins to enter custom nouns
 
     execute(input: Input) {
         var nouns = [

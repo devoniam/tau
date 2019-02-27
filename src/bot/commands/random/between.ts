@@ -1,22 +1,35 @@
 import { Command, Input } from '@api';
+import { Emoji } from '@bot/libraries/emoji';
 
 export class Between extends Command {
     constructor() {
         super({
             name: 'between',
-            description: 'Generates a random number between `x` and `y`.',
+            description: 'Generates a random number between `x` and `y`, `Min: 0` `Max: 1000` ',
             arguments: [
                 {
                     name: 'x',
                     description: 'The minimum value.',
                     constraint: 'number',
-                    required: true
+                    required: true,
+                    eval: (input: number) => {
+                        if (input < 0) {
+                            throw new Error('`x` must be 0 or greater.');
+                        }
+                        return true;
+                    }
                 },
                 {
                     name: 'y',
                     description: 'The maximum value.',
                     constraint: 'number',
-                    required: true
+                    required: true,
+                    eval: (input: number) => {
+                        if (input > 1000) {
+                            throw new Error('`y` must be 1000 or less.');
+                        }
+                        return true;
+                    }
                 }
             ]
         });
@@ -26,6 +39,12 @@ export class Between extends Command {
         let x = input.getArgument('x') as number;
         let y = input.getArgument('y') as number;
 
-        input.channel.send('Not yet implemented.');
+        if (x > y) {
+            input.channel.send(Emoji.ERROR + " `x` cannot be greater than `y`: `between <x> <y>`");
+        }
+        else {
+            let rnd = Math.floor((Math.random() * y) + x);
+            input.channel.send(rnd);
+        }
     }
 }

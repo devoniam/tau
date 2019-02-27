@@ -8,6 +8,8 @@ export class Pun extends Command {
         });
     }
 
+    //TODO: Allow users/admins to enter custom puns
+
     execute(input: Input) {
             let puns = [
                 "About a month before he died, my uncle had his back covered in lard. After that, he went down hill fast.",
@@ -231,11 +233,8 @@ export class Pun extends Command {
                 "I cooked Pancakes this morning. I was thrilled but my kids weren't. Apparently, he was their favorite rabbit.",
                 "The artist thought his favourite paint had been stolen, but it was just a pigment of his imagination.",
                 "Where does the Easter Bunny go to eat pancakes? To IHOP, of course!",
-    
-    
                 //https://onelinefun.com/puns/22/
             ];
-    
     
             let rnd = Math.floor(Math.random() * puns.length);
 

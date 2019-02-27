@@ -5,7 +5,7 @@ class Verb extends _api_1.Command {
     constructor() {
         super({
             name: 'verb',
-            description: 'Returns a random verb.'
+            description: 'Displays a random verb.'
         });
     }
     execute(input) {
