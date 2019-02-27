@@ -5,13 +5,13 @@ import { GuildMember } from "discord.js";
 export class ExampleListener extends Listener {
 
     onGuildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
-
+        if (oldMember.displayName != newMember.displayName) {
             // nickname changed
             newMember.settings.nameHistory.push({
                 name: newMember.displayName,
                 time: _.now()
             });
             newMember.settings.save();
-        
+        }
     }
 }
