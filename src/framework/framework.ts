@@ -126,7 +126,7 @@ export class Framework {
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
                 server: { enabled: true, port: 3121 },
-                authentication: { discord: { token: '' }, cleverbot: { user: '', key: '' }}
+                authentication: { discord: { token: '' }, cleverbot: { key: '' }}
             } as BotConfiguration, null, 4));
 
             return welcome();
@@ -487,8 +487,7 @@ type BotConfiguration = {
             token: string
         },
         cleverbot: {
-            user: string;
-            key: string;
-        }
+            key: string
+        };
     }
 };

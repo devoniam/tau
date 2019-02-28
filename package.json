@@ -13,6 +13,7 @@
     "dependencies": {
         "chalk": "^2.4.2",
         "cheerio": "^1.0.0-rc.2",
+        "cleverbot-api": "^1.0.3",
         "cron": "^1.6.0",
         "discord.js": "^11.4.2",
         "easy-utf8-table": "^0.2.0",
