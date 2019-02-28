@@ -79,7 +79,7 @@ export class Reactions {
 
 }
 
-class ReactionListener {
+export class ReactionListener {
     private closeListener : () => any;
 
     constructor(fn: () => any) {

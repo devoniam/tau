@@ -3,7 +3,10 @@ import { Emoji } from "@bot/libraries/emoji";
 import * as Jimp from 'jimp';
 import { Betting } from "@bot/libraries/betting";
 import { Message } from "discord.js";
-import { Reactions } from "@bot/libraries/reactions";
+import { Reactions, ReactionListener } from "@bot/libraries/reactions";
+import { GuildMember } from "discord.js";
+import { Economy } from "@bot/libraries/economy";
+import { TextChannel } from "discord.js";
 
 const sharp = require('sharp');
 const randomNumber = require('random-number-csprng');
@@ -40,23 +43,18 @@ export class Roulette extends Command {
         // Pick where the wheel will spin to
         let landingTileIndex = await randomNumber(0, 14);
         let landingTileNumber = tiles[landingTileIndex];
-        let startWheel = await this.generateRotatedWheel(0);
         let spunWheel = await this.generateRotatedWheel(landingTileIndex * 24 + 12);
 
         // Send game welcome message
-        await input.channel.send([
-            '**Wheel of Fortune**',
-            'The following wheel will spin shortly. Place a bet on the number you think it will land on!',
-            'If you are correct, your bet will be multiplied by that amount. If you are wrong, you lose your cash.',
-            `To place a bet, use \`${input.guild.settings.prefix}bet <amount>\`. You will then be asked which number to bet on.`,
-            '_ _'
-        ].join('\n'), { files: [startWheel] });
+        let welcomeMessages = await this.welcome(input);
 
         // Send countdown
-        let countdownMessage = await input.channel.send(`_ _\n${Emoji.LOADING}  **Spinning** in 30 seconds...`);
+        let startTime = _.now();
+        let countdownMessage = await input.channel.send(`_ _\n${Emoji.LOADING}  **Spinning** in 30 seconds...`) as Message;
 
         // Listen for bets
         let bets : {[id: string]: Bet} = {};
+        let listeners : ReactionListener[] = [];
 
         reservation.on('bet', async (member, amount) => {
             let message = await input.channel.send(`:sparkles:  ${member} You are betting **$${amount.toFixed(2)}**. Please select the number to bet on.`) as Message;
@@ -77,7 +75,9 @@ export class Roulette extends Command {
                     }
                 }
             });
+            listeners.push(listener);
 
+            // If the member has already placed a bet, delete their old one
             if (member.id in bets) {
                 if (bets[member.id].message.deletable) {
                     await bets[member.id].message.delete();
@@ -86,13 +86,78 @@ export class Roulette extends Command {
                 delete bets[member.id];
             }
 
+            // Add their initial bet
             bets[member.id] = {
                 amount: amount,
-                message: message
+                message: message,
+                member: member
             };
 
+            // Add reactions to the message
             await Reactions.addReactions(message, [Emoji.SPIN_1, Emoji.SPIN_2, Emoji.SPIN_5, Emoji.SPIN_10, Emoji.SPIN_20]);
         });
+
+        // Count down
+        await this.countdown(countdownMessage, startTime);
+
+        // Close all reaction listeners
+        _.each(listeners, listener => {
+            listener.close();
+        });
+
+        // Count number of bets
+        let validBets = 0;
+        _.each(bets, bet => {
+            if (bet.number) validBets++;
+        })
+
+        // Delete the messages
+        try {
+            for (let id in bets) {
+                await bets[id].message.delete();
+            }
+
+            await welcomeMessages[0].delete();
+            await welcomeMessages[1].delete();
+            await countdownMessage.delete();
+        }
+        catch (err) {}
+
+        // Stop if there aren't any bets
+        if (validBets == 0) {
+            reservation.close();
+            await input.channel.send([
+                `${Emoji.ERROR}  There were no bets, so the game was cancelled.`
+            ]);
+            return;
+        }
+
+        // Post the resulting wheel
+        await input.channel.send({ files: [ spunWheel ] });
+        await input.channel.send([
+            '_ _',
+            `**The wheel landed on ${landingTileNumber}!**`,
+            await this.calculateWinnersLosers(landingTileNumber, bets),
+            '_ _'
+        ]);
+
+        // Award or take monies
+        for (let id in bets) {
+            let bet = bets[id];
+
+            if (bet.number) {
+                if (bet.number == landingTileNumber) {
+                    let amount = bet.amount + (bet.amount * landingTileNumber);
+                    await Economy.addBalance(bet.member, amount, input.channel as TextChannel);
+                }
+                else {
+                    await Economy.removeBalance(bet.member, bet.amount);
+                }
+            }
+        }
+
+        // Release the reservation
+        reservation.close();
     }
 
     /**
@@ -126,10 +191,66 @@ export class Roulette extends Command {
 
         return 0;
     }
+
+    private async welcome(input: Input) {
+        return [
+            await input.channel.send([
+                '**Wheel of Fortune**',
+                'The following wheel will spin shortly. Place a bet on the number you think it will land on!',
+                'If you are correct, your bet will be multiplied by that amount. If you are wrong, you lose your cash.',
+                `To place a bet, use \`${input.guild.settings.prefix}bet <amount>\`. You will then be asked which number to bet on.`,
+                '_ _'
+            ].join('\n')) as Message,
+            await input.channel.send({
+                files: [ await this.generateRotatedWheel(0) ]
+            }) as Message
+        ];
+    }
+
+    private async countdown(message: Message, start: number) {
+        let elapsed = (_.now() - start) / 1000;
+        let remaining = Math.ceil(30 - elapsed);
+
+        let fn = async () => {
+            elapsed = (_.now() - start) / 1000;
+            remaining = Math.ceil(30 - elapsed);
+
+            if (remaining > 0) {
+                await message.edit(`_ _\n${Emoji.LOADING}  **Spinning** in ${remaining} seconds...`);
+            }
+            else {
+                await message.edit(`${Emoji.LOADING}  **Spinning** now...`);
+            }
+        };
+
+        while (remaining > 0) {
+            await sleep(Math.min(2000, remaining * 1000));
+            await fn();
+        }
+    }
+
+    private async calculateWinnersLosers(number: number, bets: {[id: string]: Bet}) : Promise<string> {
+        let winners : string[] = [];
+        let losers : string[] = [];
+        let output = '';
+
+        _.each(bets, bet => {
+            if (bet.number) {
+                if (bet.number == number) winners.push(bet.member.toString());
+                else losers.push(bet.member.toString());
+            }
+        });
+
+        if (winners.length == 0) return 'Everybody lost!';
+        if (losers.length == 0) return 'Everybody won!';
+
+        return `Winners: ${winners.join(', ')}\nLosers: ${losers.join(', ')}`;
+    }
 }
 
 type Bet = {
     amount: number;
     number?: number;
     message: Message;
+    member: GuildMember;
 };

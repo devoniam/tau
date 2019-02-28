@@ -244,6 +244,9 @@ class Framework {
         return found;
     }
     static listen() {
+        this.client.on('rateLimit', info => {
+            this.logger.warning(`Hit rate limit!`);
+        });
         this.client.on('message', async (message) => {
             if (message.channel.type !== 'text')
                 return;

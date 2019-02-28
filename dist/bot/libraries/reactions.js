@@ -66,6 +66,7 @@ class ReactionListener {
         this.closeListener();
     }
 }
+exports.ReactionListener = ReactionListener;
 function cleanup() {
     Reactions.clean();
     setTimeout(cleanup, 10000);
