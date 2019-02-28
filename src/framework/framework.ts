@@ -361,7 +361,7 @@ export class Framework {
      */
     private static listen() {
         this.client.on('rateLimit', info => {
-            this.logger.warning(`Hit rate limit!`);
+            this.logger.verbose(`Hit rate limit on ${info.method.toUpperCase()} ${info.path}`);
         });
 
         this.client.on('message', async message => {

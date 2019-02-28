@@ -55,7 +55,7 @@ export class Reactions {
             return new Promise(resolve => {
                 setTimeout(() => {
                     message.reactCustom(emojis[i]).then(resolve, resolve);
-                }, i * 320);
+                }, i * 500);
             });
         };
 
