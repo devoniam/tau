@@ -1,19 +1,17 @@
 import { Command, Input } from "@api";
-import { Message } from "discord.js";
-import * as fs from 'fs';
 import { Emoji } from "@bot/libraries/emoji";
+import * as Jimp from 'jimp';
+import { Betting } from "@bot/libraries/betting";
+import { Message } from "discord.js";
+import { Reactions } from "@bot/libraries/reactions";
 
 const sharp = require('sharp');
-const GIFEncoder = require('gifencoder');
-const Jimp = require('jimp');
 const randomNumber = require('random-number-csprng');
 
-let base = sharp(pub('roulette/wheel-base.png'));
+let base = sharp(pub('roulette/wheel.png'));
 let pointer : any;
-let cache : {[degrees: number]: Buffer} = {};
-let target = 25;
 
-const tiles = [1, 3, 1, 5, 1, 5, 3, 1, 10, 1, 3, 1, 5, 1, 3, 1, 20, 1, 3, 1, 5, 1, 3, 1, 10];
+const tiles = [10, 5, 1, 2, 1, 5, 1, 10, 1, 2, 1, 20, 1, 2, 1];
 
 export class Roulette extends Command {
     constructor() {
@@ -22,92 +20,86 @@ export class Roulette extends Command {
             description: 'Starts a game of wheel of fortune. If it lands on your number, your bet is multiplied by that number. If it doesn\'t, say goodbye to your cash.',
             aliases: ['spin', 'wheel', 'fortune']
         });
+
+        // Preload the pointer image via Jimp
+        Jimp.read(pub('roulette/pointer.png')).then(j => {
+            pointer = j;
+        });
     }
 
     async execute(input: Input) {
-        if (!pointer) {
-            pointer = await Jimp.read(pub('roulette/pointer.png'));
+        // Check if there is another gambling game ongoing
+        if (!Betting.isGameAvailable(input.channel)) {
+            input.channel.send(`${Emoji.ERROR}  Another gambling game is running in the same channel. Wait for it to complete.`);
+            return;
         }
 
-        let landingTileIndex = await randomNumber(0, 24);
+        // Reserve the channel
+        let reservation = Betting.reserve(input.channel);
+
+        // Pick where the wheel will spin to
+        let landingTileIndex = await randomNumber(0, 14);
         let landingTileNumber = tiles[landingTileIndex];
-        let animationBufferPromise = this.createAnimation(landingTileIndex);
-        let animationPath = tmp(`spinning-wheel-${_.now()}.gif`);
+        let startWheel = await this.generateRotatedWheel(0);
+        let spunWheel = await this.generateRotatedWheel(landingTileIndex * 24 + 12);
 
-        let msg = await input.channel.send(`${Emoji.LOADING}  Preparing the wheel...`) as Message;
-        let animationBuffer = await animationBufferPromise;
-        fs.writeFileSync(animationPath, animationBuffer);
+        // Send game welcome message
+        await input.channel.send([
+            '**Wheel of Fortune**',
+            'The following wheel will spin shortly. Place a bet on the number you think it will land on!',
+            'If you are correct, your bet will be multiplied by that amount. If you are wrong, you lose your cash.',
+            `To place a bet, use \`${input.guild.settings.prefix}bet <amount>\`. You will then be asked which number to bet on.`,
+            '_ _'
+        ].join('\n'), { files: [startWheel] });
 
-        msg.delete();
-        await input.channel.send({
-            file: animationPath
+        // Send countdown
+        let countdownMessage = await input.channel.send(`_ _\n${Emoji.LOADING}  **Spinning** in 30 seconds...`);
+
+        // Listen for bets
+        let bets : {[id: string]: Bet} = {};
+
+        reservation.on('bet', async (member, amount) => {
+            let message = await input.channel.send(`:sparkles:  ${member} You are betting **$${amount.toFixed(2)}**. Please select the number to bet on.`) as Message;
+            let listener = Reactions.listen(message, reaction => {
+                if (reaction.member == member) {
+                    let number = this.getReactionNumber(reaction.emoji);
+                    if (number == 0) return;
+
+                    if (reaction.action == 'add') {
+                        bets[member.id].number = number;
+                        bets[member.id].message.edit(`:sparkles:  ${member} You are betting **$${amount.toFixed(2)}** on number **${number}**. Good luck!`);
+                    }
+                    else {
+                        if (number == bets[member.id].number) {
+                            bets[member.id].number = undefined;
+                            bets[member.id].message.edit(`:sparkles:  ${member} You are betting **$${amount.toFixed(2)}**. Please select the number to bet on.`);
+                        }
+                    }
+                }
+            });
+
+            if (member.id in bets) {
+                if (bets[member.id].message.deletable) {
+                    await bets[member.id].message.delete();
+                }
+
+                delete bets[member.id];
+            }
+
+            bets[member.id] = {
+                amount: amount,
+                message: message
+            };
+
+            await Reactions.addReactions(message, [Emoji.SPIN_1, Emoji.SPIN_2, Emoji.SPIN_5, Emoji.SPIN_10, Emoji.SPIN_20]);
         });
-
-        fs.unlinkSync(animationPath);
-
-        setTimeout(() => {
-            input.channel.send('Landed on ' + landingTileNumber);
-        }, 3000);
     }
 
-    async createAnimation(step: number) {
-        // step = 0-24
-
-        let goal = ((step >= 11) ? 0 : 3600) + 72 + (step * 144);
-
-        const encoder = new GIFEncoder(300, 300);
-
-        let stream : fs.ReadStream = encoder.createReadStream();
-        let chunks : any[] = [];
-        let promise = new Promise((resolve, reject) => {
-            stream.on('end', resolve);
-            stream.on('error', reject);
-        });
-
-        stream.on('readable', function() {
-            let data;
-
-            while (data = stream.read()) {
-                chunks.push(data);
-            }
-        });
-
-        encoder.start();
-        encoder.setRepeat(- 1);
-        encoder.setDelay(70);
-        encoder.setQuality(10);
-
-        let rotation = 72;
-        let slow = ((step >= 11) ? 0 : 3600) + 72 + (step * 144) - (72 * 6);
-        let slow2 = ((step >= 11) ? 0 : 3600) + 72 + (step * 144) - (72 * 4);
-        let slow3 = ((step >= 11) ? 0 : 3600) + 72 + (step * 144) - (72 * 2);
-
-        encoder.addFrame(await this.generateRotatedWheel(7.2));
-
-        while (rotation < goal) {
-            rotation += 72;
-            let times = 1;
-
-            if (rotation >= slow) times = 2;
-            if (rotation >= slow2) times = 3;
-            if (rotation >= slow3) times = 5;
-
-            for (let i = 0; i < times; i++) {
-                encoder.addFrame(await this.generateRotatedWheel(rotation / 10));
-            }
-        }
-
-        encoder.finish();
-        await promise;
-        return Buffer.concat(chunks);
-    }
-
-    async generateRotatedWheel(degrees: number) {
+    /**
+     * Returns the buffer for a transparent PNG image of the spinning wheel with the specified degrees of rotation.
+     */
+    private async generateRotatedWheel(degrees: number) {
         degrees %= 360;
-
-        if (cache[degrees]) {
-            return cache[degrees];
-        }
 
         let copy = base.clone().rotate(degrees, {
             background: '#ffffff00'
@@ -115,12 +107,29 @@ export class Roulette extends Command {
 
         let buffer = await copy.toBuffer();
         let rotated = await Jimp.read(buffer);
-        let canvas = new Jimp(300, 300, 0x36393fff);
+        let canvas = new Jimp(200, 200, 0xffffff00);
 
-        canvas.composite(rotated, Math.floor(-(rotated.bitmap.width / 2 - 150)), Math.floor(-(rotated.bitmap.height / 2 - 150)));
+        canvas.composite(rotated, Math.floor(-(rotated.bitmap.width / 2 - 100)), Math.floor(-(rotated.bitmap.height / 2 - 100)));
         canvas.composite(pointer, 0, 0);
 
-        cache[degrees] = canvas.bitmap.data;
-        return canvas.bitmap.data;
+        return await canvas.getBufferAsync(Jimp.MIME_PNG);
+    }
+
+    private getReactionNumber(emoji: string) : number {
+        switch (emoji) {
+            case Emoji.SPIN_1: return 1;
+            case Emoji.SPIN_2: return 2;
+            case Emoji.SPIN_5: return 5;
+            case Emoji.SPIN_10: return 10;
+            case Emoji.SPIN_20: return 20;
+        }
+
+        return 0;
     }
 }
+
+type Bet = {
+    amount: number;
+    number?: number;
+    message: Message;
+};

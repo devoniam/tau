@@ -40,6 +40,20 @@ Message.prototype.deleteAfter = (function(ms) {
     }, ms);
 });
 
+Message.prototype.reactCustom = (async function(emoji) {
+    let client = require('@core/framework').Framework.getClient();
+    let matches = /<:.+:(\d+)>/.exec(emoji);
+
+    if (matches) {
+        let id = matches[1];
+        let emoji = client.emojis.get(id);
+
+        return await this.react(emoji);
+    }
+
+    throw new Error('No known custom emoji "' + emoji + '".');
+});
+
 Guild.prototype.getDefaultChannel = (function() {
     let channels = this.channels.array();
     let user = require('@core/framework').Framework.getClient().user;

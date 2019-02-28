@@ -21,5 +21,35 @@ export enum Emoji {
      * A spinning loading emoji that only looks good on dark backgrounds.
      * @source Production Studio Server
      */
-    LOADING = '<a:loading:549174816217890828>'
+    LOADING = '<a:loading:549174816217890828>',
+
+    /**
+     * For wheel of fortune.
+     * @source Production Studio Server
+     */
+    SPIN_1 = '<:spin1:550633464073027594>',
+
+    /**
+     * For wheel of fortune.
+     * @source Production Studio Server
+     */
+    SPIN_2 = '<:spin2:550633463733288961>',
+
+    /**
+     * For wheel of fortune.
+     * @source Production Studio Server
+     */
+    SPIN_5 = '<:spin5:550633464060444673>',
+
+    /**
+     * For wheel of fortune.
+     * @source Production Studio Server
+     */
+    SPIN_10 = '<:spin10:550633464102387747>',
+
+    /**
+     * For wheel of fortune.
+     * @source Production Studio Server
+     */
+    SPIN_20 = '<:spin20:550633463946936340>'
 };
