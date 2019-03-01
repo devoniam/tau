@@ -1,14 +1,15 @@
 import {Command, Input} from '@api';
 import {Emoji} from "@libraries/emoji";
-import {VoiceChannel} from "discord.js";
+import {Guild, TextChannel, VoiceChannel} from "discord.js";
 import {GuildPlayerConfig} from "@libraries/music/guild-player-config";
-import * as cheerio from 'cheerio';
-import * as request from 'request';
-import {Response} from "request";
-import {validateURL, getInfo, downloadFromInfo, videoInfo} from 'ytdl-core'
-import {numberedList} from "@bot/libraries/utilities/numbered-list";
+import {validateURL, getInfo} from 'ytdl-core'
 import {userRangedChoice} from "@libraries/utilities/user-range-choice";
-
+import {searchyt} from "@libraries/music/search-yt";
+import {ProgressBar} from "@libraries/utilities/progress-bar";
+import {VideoDownloader} from "@libraries/music/video-download";
+import {SongInfo} from "@libraries/music/song-info";
+import {numberedList} from "@libraries/utilities/numbered-list";
+import {MusicMessagePlayer} from "@libraries/music/music-message-player";
 
 let trackedGuilds: { [id: string]: GuildPlayerConfig } = {};
 
@@ -40,12 +41,12 @@ export class Music extends Command {
                     name: 'options',
                     required: false,
                     expand: true,
-                    eval: (options: string, args) => {
-                        let action = args[0].parsedValue;
-
-                        if (action == 'play') throw new Error("Caught play command");
-                        return true;
-                    }
+                    // eval: (options: string, args) => {
+                    //     let action = args[0].parsedValue;
+                    //
+                    //     if (action == 'play') throw new Error("Caught play command");
+                    //     return true;
+                    // }
                 }
             ]
         });
@@ -65,12 +66,7 @@ export class Music extends Command {
 
         // Get the guilds music data configuration
         let id = input.guild.id;
-        let playConfig = trackedGuilds[id] ? trackedGuilds[id] : trackedGuilds[id] = new GuildPlayerConfig(id);
-
-        // Check to see if it's playing music
-        if (playConfig.currentlyPlaying)
-            this.getLogger().debug(`Currently playing ${playConfig.currentlyPlaying.title}`);
-
+        let playConfig = trackedGuilds[id] ? trackedGuilds[id] : trackedGuilds[id] = new GuildPlayerConfig(input.guild);
 
         let result: string = '';
 
@@ -81,10 +77,10 @@ export class Music extends Command {
                     return;
                 }
 
-                let url = validateURL(options) ? options : (await this.searchyt(options))[0].url;
-                let info = await getInfo(url);
+                let url = validateURL(options) ? options : (await searchyt(options))[0].url;
 
-                result += 'play';
+                await this.playUrl(url, input, playConfig);
+
                 break;
             case 'search':
                 if (options == null) {
@@ -92,34 +88,75 @@ export class Music extends Command {
                     return;
                 }
 
-                let ytresults = (await this.searchyt(options)).splice(0, 10);
-                let userChoiceMsg = numberedList(ytresults, 'title');
-                await input.channel.send(userChoiceMsg);
+                let ytresults = (await searchyt(options)).splice(0, 10);
 
-                // const filter = (n => !isNaN(n) && parseInt(n.content) <= ytresults.length && parseInt(n.content) > 0 && n.author.id === input.member.id);
+                let choiceVid = await userRangedChoice(input, ytresults, 'title');
 
-                let response = `\n**Choose a number Between 1-${ytresults.length}**`;
+                await this.playUrl(choiceVid.url, input, playConfig);
 
-                // await userRangedChoice(input.member, filter, ytresults.length);
-
-                result += 'search';
                 break;
             case 'stop':
                 result += 'stop';
                 break;
             case 'pause':
+                if (!playConfig.dispatcher || !playConfig.currentlyPlaying) {
+                    await input.channel.send(`A song must currently be playing to use this command`);
+                    return;
+                }
+                if (playConfig.dispatcher.paused) {
+                    await input.channel.send(`Music player is already paused`);
+                    return;
+                }
+
+                playConfig.dispatcher.pause();
+                await input.channel.send(`Pausing **${playConfig.currentlyPlaying.title}**`);
+
                 result += 'pause';
                 break;
             case 'skip':
+                if (!playConfig.dispatcher || !playConfig.currentlyPlaying) {
+                    await input.channel.send(`A song must currently be playing to use this command`);
+                    return;
+                }
+
+                playConfig.dispatcher.emit('end');
+
+                await input.channel.send(`Skipping ${playConfig.currentlyPlaying.title}`);
+
                 result += 'skip';
                 break;
             case 'resume':
+                if (!playConfig.dispatcher || !playConfig.currentlyPlaying) {
+                    await input.channel.send(`A song must currently be playing to use this command`);
+                    return;
+                }
+                if (!playConfig.dispatcher.paused) {
+                    await input.channel.send(`Music player is already playing`);
+                    return;
+                }
+
+                playConfig.dispatcher.resume();
+                await input.channel.send(`Resuming **${playConfig.currentlyPlaying.title}**`);
+
                 result += 'resume';
                 break;
             case 'volume':
+                let volumeMsg = await this.setVolume(playConfig, options);
+                await input.channel.send(volumeMsg);
                 result += 'volume';
                 break;
             case 'queue':
+                if (!playConfig.dispatcher || !playConfig.currentlyPlaying) {
+                    await input.channel.send(`A song must currently be playing to use this command`);
+                    return;
+                }
+                if (playConfig.queue.length <= 0) {
+                    await input.channel.send(`**The queue is empty**`);
+                    return;
+                }
+
+                await input.channel.send(numberedList(playConfig.queue, 'title'));
+
                 result += 'queue';
                 break;
             case 'loop':
@@ -130,6 +167,18 @@ export class Music extends Command {
                 result += 'autoplay';
                 break;
             case 'seek':
+                // if (!playConfig.dispatcher || !playConfig.currentlyPlaying) {
+                //     await input.channel.send(`A song must currently be playing to use this command`);
+                //     return;
+                // }
+                //
+                // if (options == null) return `Enter the time in seconds to seek to`;
+                //
+                // let number = parseFloat(options);
+                //
+                // if (!(!isNaN(number) && number <= 100 && number >= 1)) return `Input must be a number from 1-100`;
+                //
+                // this.seekStream(playConfig, number);
                 result += 'seek';
                 break;
             case 'lyrics':
@@ -140,34 +189,72 @@ export class Music extends Command {
         await input.channel.send(Emoji.SUCCESS + `  Received play command with action ${result}`);
     }
 
-    private playUrl(url: string) {
-        console.log(`Attempting to play song ${url}`);
+    private async playUrl(url: string, input: Input, playConfig: GuildPlayerConfig) {
+        let info = await getInfo(url);
+
+        let songInfo = new SongInfo(info.title, info, input.member, input.channel as TextChannel);
+
+        await this.playQueue(playConfig, songInfo);
     }
 
-    private searchyt(searchTerm: string): Promise<{ title: string, url: string }[]> {
-        return new Promise((resolve, reject) => {
-            let ytresults: { title: string, url: string }[] = [];
+    async playQueue(server: GuildPlayerConfig, video: SongInfo) {
+        server.queue.push(video);
 
-            request('https://www.youtube.com/results?search_query=' + searchTerm, (error: any, response: Response, body: any) => {
-                if (error) return this.getLogger().error(error);
-                let $ = cheerio.load(body);
+        if (!server.connection) {
+            server.connection = await video.requester.voiceChannel.join();
 
-                let results = $('h3.yt-lockup-title a');
-                results.each((index: number, element: CheerioElement) => {
-                    let row = $(element);
+            if (!server.connection) return;
+            server.currentlyPlaying = server.queue.shift();
+            await this.startStream(server);
+        }
+        else {
+            await video.textChannel.send(`Added **${video.title}** to the queue at position **${server.queue.length}**`);
+        }
+    }
 
-                    if (!(/\/watch\?v=([\w-]+)/.test(row.attr('href')))) return;
+    async startStream(server: GuildPlayerConfig) {
+        if (!server.currentlyPlaying)
+            throw new Error('Called startStream on an un-initialized server');
 
-                    let title = row.text();
-                    let url = row.attr('href');
+        let dl = new VideoDownloader(server.currentlyPlaying.url, server);
+        let progressBar = new ProgressBar(`Buffering Song... **${server.currentlyPlaying.title}**`, server.currentlyPlaying.textChannel);
 
-                    ytresults.push({title, url});
-                    // console.log(title, url);
-                });
+        await progressBar.initialize();
 
-                resolve(ytresults);
-            });
+        dl.on('progress', percent => progressBar.update(percent));
+
+        dl.on('complete', async (file) => {
+            if (!server.currentlyPlaying)
+                throw new Error('Called startStream on an un-initialized server');
+            progressBar.update(1);
+            server.currentlyPlaying.file = file;
+            await this.seekStream(server, 0);
         });
+    }
+
+    async seekStream(server: GuildPlayerConfig, timeStamp: number) {
+        if (!server.connection || !server.currentlyPlaying)
+            throw new Error("Seek stream called on an unprepared server!");
+        if (!server.currentlyPlaying.file)
+            throw new Error("Server is ready, but no music file is set.");
+
+        console.log(`Attempting to seek in stream to ${timeStamp}`);
+
+        if (!server.messagePlayer)
+            server.messagePlayer = new MusicMessagePlayer(server.currentlyPlaying.textChannel);
+
+        let defaultVolume = server.guild.settings.voice.volume;
+        let t = timeStamp || 0;
+
+        server.dispatcher = await server.connection.playFile(server.currentlyPlaying.file,
+            {
+                seek: t,
+                volume: defaultVolume,
+                passes: 10,
+                bitrate: 96000
+            });
+        server.dispatcher.setVolume(defaultVolume);
+        this.createListeners(server);
     }
 
     getUsage(): string {
@@ -176,5 +263,38 @@ export class Music extends Command {
         // The rest of the lines are shown as help text below it - we can use this to document the actions.
 
         return super.getUsage();
+    }
+
+    private async setVolume(config: GuildPlayerConfig, volString: string | undefined): Promise<string> {
+
+        if (volString == null) return `Volume is currently **${config.guild.settings.voice.volume * 100}**%`;
+
+        let number = parseFloat(volString);
+
+        if (!(!isNaN(number) && number <= 100 && number >= 1)) return `Input must be a number from 1-100`;
+
+        config.guild.settings.voice.volume = number / 100;
+        let vol = config.guild.settings.voice.volume;
+        await config.guild.settings.save();
+
+        if (config.dispatcher)
+            config.dispatcher.setVolume(vol);
+
+        return `Setting volume to **${vol * 100}**%`;
+    }
+
+    private playNextOrEnd(server: GuildPlayerConfig) {
+
+    }
+
+    createListeners(server: GuildPlayerConfig) {
+        if (!server.dispatcher || !server.currentlyPlaying)
+            throw new Error('Called set listeners before stream was created');
+        server.dispatcher.on('end', async () => {
+            if (server.currentlyPlaying)
+                server.currentlyPlaying.textChannel.send('End of queue reached, leaving the voice channel.');
+            if (server.connection)
+                server.connection.disconnect();
+        });
     }
 }

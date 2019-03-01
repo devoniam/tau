@@ -1,15 +1,18 @@
 import {SongInfo} from "@libraries/music/song-info";
-import {VoiceConnection} from "discord.js";
+import {Guild, StreamDispatcher, TextChannel, VoiceConnection} from "discord.js";
+import {MusicMessagePlayer} from "@libraries/music/music-message-player";
 
 export class GuildPlayerConfig {
-    public id: string;
+    public guild: Guild;
     public currentlyPlaying?: SongInfo;
-    public conenction?: VoiceConnection;
+    public connection?: VoiceConnection;
+    public dispatcher?: StreamDispatcher;
     public queue: SongInfo[];
     public autoplay: boolean;
+    public messagePlayer?: MusicMessagePlayer;
 
-    constructor(id: string) {
-        this.id = id;
+    constructor(guild: Guild) {
+        this.guild = guild;
         this.queue = [];
         this.autoplay = false;
     };
