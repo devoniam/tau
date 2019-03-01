@@ -14,7 +14,7 @@ export class GuildBucket {
      * The voice settings to use for the guild.
      */
     public voice: GuildVoiceSettings = {
-        volume: 50
+        volume: 0.5
     };
 
     /**

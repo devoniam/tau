@@ -8,6 +8,7 @@ export class SongInfo {
     public url: string;
     public requester: GuildMember;
     public textChannel: TextChannel;
+    public file?: string;
 
     constructor(title: string, info: videoInfo, requester: GuildMember, textChannel: TextChannel) {
         this.title = title;
