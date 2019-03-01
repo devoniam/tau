@@ -1,10 +1,13 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, Channel, TextChannel } from "discord.js";
+import { Message } from "discord.js";
+import { Reactions } from "./reactions";
+import { Emoji } from "./emoji";
 
 export class Inventory {
     /**
      * Adds an item to the inventory of a member.
      */
-    public static async addItem(member: GuildMember, item: Item, amount: number) : Promise<void> {
+    public static async addItem(member: GuildMember, item: Item, amount: number, announceChannel?: Channel) : Promise<void> {
         await member.load();
 
         // Add the amount
@@ -12,6 +15,13 @@ export class Inventory {
 
         // Save
         await member.settings.save();
+
+        // Announce the find if applicable
+        if (announceChannel) {
+            let channel = announceChannel as TextChannel;
+
+            await channel.send(`${this.getIcon(item)}  ${member} found **${amount}x** ${this.getName(item)}.`);
+        }
     }
 
     /**
@@ -43,12 +53,58 @@ export class Inventory {
     public static async hasItem(member: GuildMember, item: Item, amount: number = 1) : Promise<boolean> {
         await member.load();
 
-        // Find the index of the item and the current balance
-        let index = this.getIndex(member, item);
-        let balance = member.settings.inventory[index].amount;
-
-        // Check if the balance is high enough
+        let balance = await this.getItemAmount(member, item);
         return amount <= balance;
+    }
+
+    /**
+     * Starts a transaction with the member for an item. Returns `false` if there is an error or they reject the
+     * transaction. Returns `true` if the transaction is complete and the item has been taken.
+     */
+    public static async transactItem(member: GuildMember, item: Item, amount: number = 1, txnChannel: Channel) : Promise<boolean> {
+        await member.load();
+
+        // Make sure they have enough of the item
+        if (!(await this.hasItem(member, item, amount))) {
+            return false;
+        }
+
+        // Get authorization
+        let channel = txnChannel as TextChannel;
+        let message = await channel.send(`${this.getIcon(item)}  ${member} This will cost you **${amount}x** ${this.getName(item)}. Are you sure?`) as Message;
+        let resolver : (status: boolean) => void;
+        let promise : Promise<boolean> = new Promise(resolve => { resolver = resolve; });
+        let finished = false;
+
+        // Listen for emojis
+        Reactions.listen(message, async reaction => {
+            if (finished) return;
+
+            if (reaction.action == 'add' && reaction.member == member) {
+                if (reaction.emoji == Emoji.SUCCESS) {
+                    finished = true;
+
+                    await this.removeItem(member, item, amount);
+                    await message.edit(`${Emoji.SUCCESS}  ${member} Transaction approved.`);
+                    message.deleteAfter(5000);
+
+                    resolver(true);
+                }
+                else if (reaction.emoji == Emoji.ERROR) {
+                    finished = true;
+
+                    resolver(false);
+                    await message.edit(`${Emoji.ERROR}  ${member} Transaction declined.`);
+                    message.deleteAfter(5000);
+                }
+            }
+        });
+
+        // Add emojis
+        await Reactions.addReactions(message, [Emoji.SUCCESS, Emoji.ERROR]);
+
+        // Wait and return
+        return await promise;
     }
 
     /**

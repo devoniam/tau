@@ -1,10 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const reactions_1 = require("./reactions");
+const emoji_1 = require("./emoji");
 class Inventory {
-    static async addItem(member, item, amount) {
+    static async addItem(member, item, amount, announceChannel) {
         await member.load();
         member.settings.inventory[this.getIndex(member, item)].amount += amount;
         await member.settings.save();
+        if (announceChannel) {
+            let channel = announceChannel;
+            await channel.send(`${this.getIcon(item)}  ${member} found **${amount}x** ${this.getName(item)}.`);
+        }
     }
     static async removeItem(member, item, amount) {
         await member.load();
@@ -18,9 +24,40 @@ class Inventory {
     }
     static async hasItem(member, item, amount = 1) {
         await member.load();
-        let index = this.getIndex(member, item);
-        let balance = member.settings.inventory[index].amount;
+        let balance = await this.getItemAmount(member, item);
         return amount <= balance;
+    }
+    static async transactItem(member, item, amount = 1, txnChannel) {
+        await member.load();
+        if (!(await this.hasItem(member, item, amount))) {
+            return false;
+        }
+        let channel = txnChannel;
+        let message = await channel.send(`${this.getIcon(item)}  ${member} This will cost you **${amount}x** ${this.getName(item)}. Are you sure?`);
+        let resolver;
+        let promise = new Promise(resolve => { resolver = resolve; });
+        let finished = false;
+        reactions_1.Reactions.listen(message, async (reaction) => {
+            if (finished)
+                return;
+            if (reaction.action == 'add' && reaction.member == member) {
+                if (reaction.emoji == emoji_1.Emoji.SUCCESS) {
+                    finished = true;
+                    await this.removeItem(member, item, amount);
+                    await message.edit(`${emoji_1.Emoji.SUCCESS}  ${member} Transaction approved.`);
+                    message.deleteAfter(5000);
+                    resolver(true);
+                }
+                else if (reaction.emoji == emoji_1.Emoji.ERROR) {
+                    finished = true;
+                    resolver(false);
+                    await message.edit(`${emoji_1.Emoji.ERROR}  ${member} Transaction declined.`);
+                    message.deleteAfter(5000);
+                }
+            }
+        });
+        await reactions_1.Reactions.addReactions(message, [emoji_1.Emoji.SUCCESS, emoji_1.Emoji.ERROR]);
+        return await promise;
     }
     static async getItemAmount(member, item) {
         await member.load();
