@@ -137,7 +137,7 @@ export class MemberBucket {
 }
 
 export type InventoryItem = {
-    item: string;
+    item: number;
     amount: number;
 }
 
