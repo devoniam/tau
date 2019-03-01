@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class GuildPlayerConfig {
-    constructor(id) {
-        this.id = id;
+    constructor(guild) {
+        this.guild = guild;
         this.queue = [];
         this.autoplay = false;
     }
