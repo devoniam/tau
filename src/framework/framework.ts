@@ -126,7 +126,7 @@ export class Framework {
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
                 server: { enabled: true, port: 3121 },
-                authentication: { discord: { token: '' }, cleverbot: { user: '', key: '' }}
+                authentication: { discord: { token: '' }, cleverbot: { key: '' }}
             } as BotConfiguration, null, 4));
 
             return welcome();
@@ -360,6 +360,10 @@ export class Framework {
      * Listens for messages.
      */
     private static listen() {
+        this.client.on('rateLimit', info => {
+            this.logger.verbose(`Hit rate limit on ${info.method.toUpperCase()} ${info.path}`);
+        });
+
         this.client.on('message', async message => {
             // Only listen to text channels on guilds
             if (message.channel.type !== 'text') return;
@@ -487,8 +491,7 @@ type BotConfiguration = {
             token: string
         },
         cleverbot: {
-            user: string;
-            key: string;
-        }
+            key: string
+        };
     }
 };

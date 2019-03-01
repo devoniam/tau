@@ -80,7 +80,7 @@ class Framework {
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
                 server: { enabled: true, port: 3121 },
-                authentication: { discord: { token: '' }, cleverbot: { user: '', key: '' } }
+                authentication: { discord: { token: '' }, cleverbot: { key: '' } }
             }, null, 4));
             return welcome();
         }
@@ -244,6 +244,9 @@ class Framework {
         return found;
     }
     static listen() {
+        this.client.on('rateLimit', info => {
+            this.logger.verbose(`Hit rate limit on ${info.method.toUpperCase()} ${info.path}`);
+        });
         this.client.on('message', async (message) => {
             if (message.channel.type !== 'text')
                 return;

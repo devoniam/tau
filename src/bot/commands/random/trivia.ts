@@ -31,10 +31,13 @@ let triviaCategories: string[] = [
     'Cartoons'
 ]
 
-//TODO: Decide whether Trivia should be multiplayer or single player
+//TODO: Trivia should be multiplayer, but work fine for single player
+//TODO: End game if inactive for certain amount of time
+//TODO: Generate :regional_indicator_a: :regional_indicator_b: :regional_indicator_b: and :regional_indicator_d:
+//along with the trivia question thats displayed. The players click the reaction they think is the answer
 //TODO: Make the trivia questions run on a loop that waits for player(s) to answer.
 //TODO: Once player(s) have submitted, the bot displays the correct answer and gives points to the plyer(s) that got it right
-//TODO: Add Stop command
+//TODO: Add Stop command for admins
 //TODO: Create a reaction collector
 
 //------------------[Maybe]-------------------- 
@@ -113,12 +116,11 @@ export class Trivia extends Command {
                 });
             }
 
-
             //Retrieve trivia questions from database and fix any syntax issues that may have occured
-
             let parsed = JSON.parse(body) as TriviaResponse;
             let count = 0;
-
+            do {
+            let rnd = Math.floor(Math.random() * parsed.results.length);
             let question = unescape(parsed.results[count].question);
             let incorrect_answers: string[] = [];
             _.each(parsed.results[count].incorrect_answers, s => incorrect_answers.push(s));
@@ -126,7 +128,6 @@ export class Trivia extends Command {
             let answers = [correct_answer];
             incorrect_answers.forEach(element => { answers.push(element); });
 
-           // do {
 
                 //Randomize answers before displaying
                 for (let i = answers.length - 1; i > 0; i--) {
@@ -136,15 +137,16 @@ export class Trivia extends Command {
                     answers[e] = temp;
                 }
 
-                // console.log("Answers:" + answers);
-                // console.log('Type: ' + typeURL);
-                // console.log('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
-                // console.log('results: ' + parsed.results);
-                // console.log('questions: ' + question);
-                // console.log('Category: ' + parsed.results[count].category);
+                //Only appears in the website console
+                //Use console.log for debugging
+                this.getLogger().debug("Answers:" + answers);
+                this.getLogger().debug('Type: ' + parsed.results[0].type);
+                this.getLogger().debug('URL: ' + openTDB + questionAmount + categoryURL + difficultyURL + typeURL);
+                this.getLogger().debug('results: ' + parsed.results);
+                this.getLogger().debug('questions: ' + question);
+                this.getLogger().debug('Category: ' + parsed.results[count].category);
 
-
-                if (typeURL == '&type=mutiple') {
+                if (parsed.results[count].type == 'multiple') {
                     input.channel.send({
                         embed:
                         {
@@ -190,8 +192,8 @@ export class Trivia extends Command {
                 }
             count++;
          //   const collector = (reaction, user)
-           // }
-           // while (count < 10)
+            }
+            while (count < 10)
         });
     }
 }

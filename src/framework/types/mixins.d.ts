@@ -43,5 +43,12 @@ declare module 'discord.js' {
          * **Note:** This is a custom method from the framework.
          */
         deleteAfter(ms: number): void;
+
+        /**
+         * Adds a custom emoji from the Emoji enum to the message given its string ID.
+         *
+         * **Note:** This is a custom method from the framework.
+         */
+        reactCustom(emoji: string): Promise<MessageReaction>;
     }
 }
