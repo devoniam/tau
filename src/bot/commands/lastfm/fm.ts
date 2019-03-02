@@ -47,21 +47,34 @@ export class LastFm extends Command {
                                 }
                             });
                         }
-
                         let nullText = '[undefined]';
+                        let nullURL = 'https://discordapp.com/assets/ea3b7f0aee3f51c3bbfe5a6d7f93e436.svg'
+
                         let parsed = JSON.parse(body);
+
+                        if (!parsed.recenttracks) {
+                            input.channel.send({
+                                embed: {
+                                    color: 3447003,
+                                    title: 'Connection Error',
+                                    description: "Unable to retrieve lastfm data"
+                                }
+                            });
+                            return;
+                        }
+
                         let currentTrack = parsed.recenttracks.track[0];
 
-                        let trackName = currentTrack.name;
-                        let artistName = currentTrack.artist['#text'];
-                        let albumName = currentTrack.album['#text'];
-                        let albumImage = currentTrack.image[1]['#text'];
+                        let trackName = (currentTrack.name != undefined) ? currentTrack.name : nullText;
+                        let artistName = (currentTrack.artist['#text'] != undefined) ? currentTrack.artist['#text'] : nullText;
+                        let albumName = (currentTrack.album['#text'] != undefined) ? currentTrack.album['#text'] : nullText;
+                        let albumImage = (currentTrack.image[1]['#text'] != undefined) ? currentTrack.image[1]['#text'] : nullURL;
 
                         let lastTrack = parsed.recenttracks.track[1];
 
-                        let lastTrackName = lastTrack.name;
-                        let lastArtistName = lastTrack.artist['#text'];
-                        let lastAlbumName = lastTrack.album['#text'];
+                        let lastTrackName = (lastTrack.name != undefined) ? lastTrack.name : nullText;
+                        let lastArtistName = (lastTrack.artist['#text'] != undefined) ? lastTrack.artist['#text'] : nullText;
+                        let lastAlbumName = (lastTrack.album['#text'] != undefined) ? lastTrack.album['#text'] : nullText;
 
                         let description = 'Recently Played:';
                         let prefix = 'Last track:';
@@ -69,15 +82,23 @@ export class LastFm extends Command {
                             description = 'Now Playing:';
                             prefix = 'Current:';
                         }
+
+                        let icon = input.member.user.avatarURL;
+                        let uName = ', ' + input.member.displayName;
+                        if (user != db.lastfmId) {
+                            icon = nullURL;
+                            uName = '';
+                        }
+
                         input.channel.send( {
                             embed: 
                             {
                                 color: 3447003,
                                 author: {
                                     name: user,
-                                    icon_url: input.member.user.avatarURL
+                                    icon_url: icon
                                 },
-                                title: user + ', ' + input.member.displayName,
+                                title: user + uName,
                                 url:  'https://www.last.fm/user/' + user,
                                 description: description,
                                 thumbnail: {
