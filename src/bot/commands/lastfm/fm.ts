@@ -32,12 +32,12 @@ export class LastFm extends Command {
 
         let key = '87aa68ded7b81dc193520b678aff7da6';
         let lastfmURL = 'http://ws.audioscrobbler.com/2.0/?method=';
-        let queryString = '&user=' + user + '&api_key= ' + key + '&limit=2&format=json';
+        let queryString = user + '&api_key= ' + key + '&limit=2&format=json';
 
         switch(action) {
             case 'get':
                 if (user && user != '') {
-                    let requestURL = request((lastfmURL + 'user.getRecentTracks' + queryString), (error: any, response: Response, body: any) => {
+                    let requestURL = request((lastfmURL + 'user.getRecentTracks' + '&user=' + queryString), (error: any, response: Response, body: any) => {
                         if (error) {
                             input.channel.send({
                                 embed: {
@@ -130,6 +130,49 @@ export class LastFm extends Command {
             case 'remove':
                 db.lastfmId = '';
                 input.channel.send('Lastfm username has been reset');
+                break;
+            case 'album':
+                if (input.getArgument('user')) {
+                    let requestURL = request((lastfmURL + 'album.search' + '&album=' + queryString), (error: any, response: Response, body: any) => {
+                        if (error) {
+                            input.channel.send({
+                                embed: {
+                                    color: 3447003,
+                                    title: 'Connection Error',
+                                    description: "Unable to retrieve lastfm data"
+                                }
+                            });
+                        }
+                        let nullText = '[undefined]';
+                        let nullURL = 'https://discordapp.com/assets/ea3b7f0aee3f51c3bbfe5a6d7f93e436.svg'
+
+                        let parsed = JSON.parse(body);
+
+                        if (!parsed.results) {
+                            input.channel.send({
+                                embed: {
+                                    color: 3447003,
+                                    title: 'Connection Error',
+                                    description: "Unable to retrieve lastfm data"
+                                }
+                            });
+                            return;
+                        }
+
+                        let album = parsed.results.albummatches.album[0];
+
+                        input.channel.send(album.image[3]['#text']);
+
+                    });
+                }
+                break;
+            case 'artist':
+                break;
+            case 'chart':
+                break;
+            case 'artistchart':
+                break;
+            case 'trackchart':
                 break;
         }
 
