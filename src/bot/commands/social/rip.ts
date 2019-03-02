@@ -1,5 +1,5 @@
 import { Command, Input } from '@api';
-import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
+import { GuildMember} from 'discord.js';
 import * as Jimp from 'jimp';
 import * as FS from 'fs';
 

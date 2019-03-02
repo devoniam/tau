@@ -12,5 +12,4 @@ var Emoji;
     Emoji["SPIN_10"] = "<:spin10:550633464102387747>";
     Emoji["SPIN_20"] = "<:spin20:550633463946936340>";
 })(Emoji = exports.Emoji || (exports.Emoji = {}));
-;
 //# sourceMappingURL=emoji.js.map

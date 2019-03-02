@@ -18,7 +18,7 @@ class Roulette extends _api_1.Command {
             description: 'Starts a game of wheel of fortune. If it lands on your number, your bet is multiplied by that number. If it doesn\'t, say goodbye to your cash.',
             aliases: ['spin', 'wheel', 'fortune']
         });
-        Jimp.read(pub('roulette/pointer.png')).then(j => {
+        Jimp.read(pub('roulette/pointer.png')).then((j) => {
             pointer = j;
         });
     }
