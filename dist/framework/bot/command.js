@@ -13,6 +13,9 @@ class Command {
                 this.arguments.push(new argument_1.Argument(argument));
             });
         }
+        this.init();
+    }
+    init() {
     }
     execute(input) {
         input.channel.send('This command is not yet implemented.');

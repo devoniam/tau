@@ -54,7 +54,7 @@ class Madlib extends _api_1.Command {
     getLibs() {
         let madLibPath = pub('madlib.txt');
         let madLibText = fs.readFileSync(madLibPath).toString();
-        let stories = madLibText.split('\n\n===\n\n');
+        let stories = madLibText.replace(/\r\n/, '\n').split('\n\n===\n\n');
         let libs = [];
         _.each(stories, story => {
             let titleRegex = /^#\s*(.+)$/gm;

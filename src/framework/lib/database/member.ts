@@ -41,6 +41,11 @@ export class MemberBucket {
      */
     public nameHistory: NameRecord[] = [];
 
+    /**
+     * The lastfm username of the member
+     */
+    public lastfmId?: string;
+
     constructor(id: string, guildId: string) {
         let r : Function = () => {};
         let p : Promise<void> = new Promise(resolve => {

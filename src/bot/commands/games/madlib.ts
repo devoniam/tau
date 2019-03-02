@@ -69,7 +69,7 @@ export class Madlib extends Command {
     private getLibs() {
         let madLibPath = pub('madlib.txt');
         let madLibText = fs.readFileSync(madLibPath).toString();
-        let stories = madLibText.split('\n\n===\n\n');
+        let stories = madLibText.replace(/\r\n/, '\n').split('\n\n===\n\n');
         let libs : Lib[] = [];
 
         _.each(stories, story => {
