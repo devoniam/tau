@@ -8,6 +8,16 @@ var boardEnums;
         SpaceEnum["X"] = ":x:";
         SpaceEnum["O"] = ":o:";
     })(SpaceEnum = boardEnums.SpaceEnum || (boardEnums.SpaceEnum = {}));
+    let CoordinateIndicators;
+    (function (CoordinateIndicators) {
+        CoordinateIndicators["A"] = ":regional_indicator_a:";
+        CoordinateIndicators["B"] = ":regional_indicator_b:";
+        CoordinateIndicators["C"] = ":regional_indicator_c:";
+        CoordinateIndicators["One"] = ":one:";
+        CoordinateIndicators["Two"] = ":two:";
+        CoordinateIndicators["Three"] = ":three:";
+        CoordinateIndicators["TopLeft"] = ":record_button:";
+    })(CoordinateIndicators = boardEnums.CoordinateIndicators || (boardEnums.CoordinateIndicators = {}));
 })(boardEnums = exports.boardEnums || (exports.boardEnums = {}));
 class TTTBoard {
     constructor() {
@@ -67,10 +77,10 @@ class TTTBoard {
         return boardEnums.SpaceEnum.Blank;
     }
     GetBoardVisual() {
-        let boardVisual = `\n |A|B|C|
-        \n1|${this.tiles[0][0]}|${this.tiles[0][1]}|${this.tiles[0][2]}|
-        \n2|${this.tiles[1][0]}|${this.tiles[1][1]}|${this.tiles[1][2]}|
-        \n3|${this.tiles[2][0]}|${this.tiles[2][1]}|${this.tiles[2][2]}|`;
+        let boardVisual = ` \n${boardEnums.CoordinateIndicators.TopLeft}|${boardEnums.CoordinateIndicators.A}|${boardEnums.CoordinateIndicators.B}|${boardEnums.CoordinateIndicators.C}|
+        \n${boardEnums.CoordinateIndicators.One}|${this.tiles[0][0]}|${this.tiles[0][1]}|${this.tiles[0][2]}|
+        \n${boardEnums.CoordinateIndicators.Two}|${this.tiles[1][0]}|${this.tiles[1][1]}|${this.tiles[1][2]}|
+        \n${boardEnums.CoordinateIndicators.Three}|${this.tiles[2][0]}|${this.tiles[2][1]}|${this.tiles[2][2]}|`;
         return boardVisual;
     }
 }

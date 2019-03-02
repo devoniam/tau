@@ -14,24 +14,27 @@ var tttEnums;
     })(TurnEnum = tttEnums.TurnEnum || (tttEnums.TurnEnum = {}));
     let rowColumnEnum;
     (function (rowColumnEnum) {
-        rowColumnEnum[rowColumnEnum["A"] = 0] = "A";
-        rowColumnEnum[rowColumnEnum["B"] = 1] = "B";
-        rowColumnEnum[rowColumnEnum["C"] = 2] = "C";
+        rowColumnEnum[rowColumnEnum["A"] = 1] = "A";
+        rowColumnEnum[rowColumnEnum["B"] = 2] = "B";
+        rowColumnEnum[rowColumnEnum["C"] = 3] = "C";
     })(rowColumnEnum = tttEnums.rowColumnEnum || (tttEnums.rowColumnEnum = {}));
 })(tttEnums || (tttEnums = {}));
 class TTTLobby {
-    constructor(server, channel, player1 = null, player2 = null) {
+    constructor(server, channel, manager, player1 = null, player2 = null) {
         this.currentTurn = tttEnums.TurnEnum.Searching;
         this.player1 = player1;
         this.player2 = player2;
         this.board = new ttt_board_1.TTTBoard();
         this.player1Space = ttt_board_1.boardEnums.SpaceEnum.X;
         this.player2Space = ttt_board_1.boardEnums.SpaceEnum.O;
+        this.boardMessage = null;
+        this.turnMessage = null;
         this.lobbyChannel = channel;
         this.lobbyServer = server;
+        this.lobbyManager = manager;
         this.rowString = `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.A]}`
             + `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.B]}`
-            + `$${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.C]}`;
+            + `${tttEnums.rowColumnEnum[tttEnums.rowColumnEnum.C]}`;
         this.colString = `${tttEnums.rowColumnEnum.A}`
             + `${tttEnums.rowColumnEnum.B}`
             + `${tttEnums.rowColumnEnum.C}`;
@@ -50,63 +53,68 @@ class TTTLobby {
     }
     BeginTheGame() {
         this.currentTurn = _.random(tttEnums.TurnEnum.Player1, tttEnums.TurnEnum.Player2);
-        console.log(this.colString + " " + this.rowString);
         this.GameLoop();
     }
-    GameLoop() {
-        this.lobbyChannel.send(this.board.GetBoardVisual());
+    BeginNewTurn() {
+        if (this.boardMessage === null) {
+            this.lobbyChannel.send(this.board.GetBoardVisual()).then((msg) => {
+                this.boardMessage = msg;
+            });
+        }
+        else {
+            this.boardMessage.edit(this.board.GetBoardVisual());
+        }
         let playerWithTurn = this.GetPlayerWithTurn();
         let playerSpaceIcon = this.GetPlayerWithTurnSpaceIcon();
         if (playerWithTurn) {
-            this.lobbyChannel.send(`\n${playerWithTurn.displayName}'s turn`);
+            let turnMsgText = `\n${playerWithTurn.displayName}'s turn`;
+            if (this.turnMessage === null) {
+                this.lobbyChannel.send(turnMsgText).then((msg) => {
+                    this.turnMessage = msg;
+                });
+            }
+            else {
+                this.turnMessage.edit(turnMsgText);
+            }
         }
-        let winner = this.board.CheckForWinner();
-        if (winner === this.player1Space) {
-            this.lobbyChannel.send(`${this.player1} wins`);
+        return { playerWithTurn, playerSpaceIcon };
+    }
+    GameLoop() {
+        let { playerWithTurn, playerSpaceIcon } = this.BeginNewTurn();
+        let doReturn = this.IsGameOver();
+        if (doReturn) {
+            if (this.turnMessage) {
+                this.turnMessage.delete();
+            }
+            this.lobbyManager.FindAndRemoveLobby(this);
             return;
         }
-        if (winner === this.player2Space) {
-            this.lobbyChannel.send(`${this.player2} wins`);
-            return;
-        }
-        if (winner !== null) {
-            this.lobbyChannel.send(`A tie, as per usual`);
-            return;
-        }
-        let coordinateRegex = new RegExp('([' + this.rowString + this.colString + '])', "g");
+        let coordinateRegex = new RegExp('([' + this.rowString + this.colString + '])', 'gi');
         const filter = (message) => message.member === playerWithTurn
             && coordinateRegex.test(message.content);
         const collector = this.lobbyChannel.createMessageCollector(filter);
         let successfullyChangedTile = false;
         let self = this;
         collector.once('collect', function (message) {
-            let verticalInput = null;
-            let verticalRegex = new RegExp('([' + self.colString + '])');
-            if (verticalRegex.test(message.content)) {
-                verticalInput = String(message.content.match(verticalRegex));
-            }
-            let horizontalInput = null;
-            let horizontalRegex = new RegExp('([' + self.rowString + '])');
-            if (horizontalRegex.test(message.content)) {
-                horizontalInput = String(message.content.match(horizontalRegex));
-            }
+            let verticalInput = self.GetInput(self, message, new RegExp('([' + self.colString + '])', 'i'));
+            let horizontalInput = self.GetInput(self, message, new RegExp('([' + self.rowString + '])', 'i'));
             let x = 1;
             let y = 1;
             if (verticalInput !== null && !isNaN(Number(verticalInput))) {
                 y = Number(verticalInput) - 1;
             }
             if (horizontalInput !== null) {
-                if (horizontalInput === "A") {
-                    x = tttEnums.rowColumnEnum.A;
+                if (horizontalInput.toUpperCase() === "A") {
+                    x = tttEnums.rowColumnEnum.A - 1;
                 }
-                else if (horizontalInput === "B") {
-                    x = tttEnums.rowColumnEnum.B;
+                else if (horizontalInput.toUpperCase() === "B") {
+                    x = tttEnums.rowColumnEnum.B - 1;
                 }
-                else if (horizontalInput === "C") {
-                    x = tttEnums.rowColumnEnum.C;
+                else if (horizontalInput.toUpperCase() === "C") {
+                    x = tttEnums.rowColumnEnum.C - 1;
                 }
             }
-            console.log(`${x} ${y}`);
+            message.delete();
             successfullyChangedTile = self.board.ChangeTile(x, y, playerSpaceIcon);
             if (successfullyChangedTile) {
                 self.currentTurn = (self.currentTurn === tttEnums.TurnEnum.Player1
@@ -115,6 +123,16 @@ class TTTLobby {
             self.GameLoop();
         });
     }
+    GetInput(self, message, regexp) {
+        let input = null;
+        if (regexp.test(message.content)) {
+            let match = message.content.match(regexp);
+            if (match) {
+                input = String(match[0]);
+            }
+        }
+        return input;
+    }
     GetLobbyChannel() {
         return this.lobbyChannel;
     }
@@ -122,7 +140,6 @@ class TTTLobby {
         return this.lobbyServer;
     }
     GetPlayer(playerNumber) {
-        console.log(this.player1 + " " + this.player2);
         if (playerNumber === 1) {
             return this.player1;
         }
@@ -150,6 +167,22 @@ class TTTLobby {
             xo = this.player2Space;
         }
         return xo;
+    }
+    IsGameOver() {
+        let winner = this.board.CheckForWinner();
+        if (winner === this.player1Space) {
+            this.lobbyChannel.send(`${this.player1} wins`);
+            return true;
+        }
+        if (winner === this.player2Space) {
+            this.lobbyChannel.send(`${this.player2} wins`);
+            return true;
+        }
+        if (winner !== null) {
+            this.lobbyChannel.send(`A tie, as per usual`);
+            return true;
+        }
+        return false;
     }
 }
 exports.TTTLobby = TTTLobby;

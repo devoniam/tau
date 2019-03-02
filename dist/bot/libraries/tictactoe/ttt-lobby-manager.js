@@ -6,12 +6,19 @@ class TTTLobbyManager {
         this.lobbies = lobbies;
     }
     AddLobby(server, channel, player) {
-        this.lobbies.push(new ttt_lobby_1.TTTLobby(server, channel, player, null));
+        this.lobbies.push(new ttt_lobby_1.TTTLobby(server, channel, this, player, null));
         return this.lobbies.length - 1;
     }
     BeginGameInLobby(lobbyIndex) {
         if (this.lobbies[lobbyIndex].GetPlayer(1) !== null && this.lobbies[lobbyIndex].GetPlayer(2) !== null) {
             this.lobbies[lobbyIndex].BeginTheGame();
+        }
+    }
+    FindAndRemoveLobby(lobby) {
+        let lobbyIndex = this.FindLobby(lobby);
+        if (!isNaN(lobbyIndex)) {
+            console.log("Okay");
+            this.RemoveLobby(lobbyIndex);
         }
     }
     FindLobby(lobby) {
@@ -20,7 +27,7 @@ class TTTLobbyManager {
                 return index;
             }
         }
-        return undefined;
+        return NaN;
     }
     GetLobby(lobbyIndex) {
         return this.lobbies[lobbyIndex];
