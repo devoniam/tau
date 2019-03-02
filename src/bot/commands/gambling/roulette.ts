@@ -25,7 +25,7 @@ export class Roulette extends Command {
         });
 
         // Preload the pointer image via Jimp
-        Jimp.read(pub('roulette/pointer.png')).then(j => {
+        Jimp.read(pub('roulette/pointer.png')).then((j: any) => {
             pointer = j;
         });
     }
@@ -109,7 +109,7 @@ export class Roulette extends Command {
         let validBets = 0;
         _.each(bets, bet => {
             if (bet.number) validBets++;
-        })
+        });
 
         // Delete the messages
         try {

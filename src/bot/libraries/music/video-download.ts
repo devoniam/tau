@@ -1,11 +1,11 @@
-import {GuildPlayerConfig} from "@libraries/music/guild-player-config";
+import {Session} from "@libraries/music/session";
 import * as path from "path";
 import {EventEmitter} from "events";
 import * as fs from "fs";
 import ytdl = require("ytdl-core");
 
 export class VideoDownloader extends EventEmitter {
-    constructor(url: string, server: GuildPlayerConfig) {
+    constructor(url: string, server: Session) {
         super();
         url = url.replace(/^.+\.com\//, '');
 

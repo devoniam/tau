@@ -52,4 +52,4 @@ export enum Emoji {
      * @source Production Studio Server
      */
     SPIN_20 = '<:spin20:550633463946936340>'
-};
+}
