@@ -6,7 +6,7 @@ class GuildBucket {
         this.rowExists = false;
         this.prefix = '!';
         this.voice = {
-            volume: 50
+            volume: 0.5
         };
         this.notifications = {
             newYoutubeVideo: 'New video available! {{ link }}',
