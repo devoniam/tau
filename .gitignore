@@ -85,3 +85,4 @@ config.json
 auth.json
 run bot.bat
 data/storage
+dist/

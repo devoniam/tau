@@ -8,7 +8,9 @@
         "url": "https://github.com/baileyherbert/studiobot"
     },
     "scripts": {
-        "test": "mocha -r ts-node/register test/**/*.ts"
+        "test": "mocha -r ts-node/register test/**/*.ts",
+        "build": "tsc",
+        "watch": "tsc --watch"
     },
     "dependencies": {
         "chalk": "^2.4.2",
@@ -17,6 +19,7 @@
         "cron": "^1.6.0",
         "discord.js": "^11.4.2",
         "easy-utf8-table": "^0.2.0",
+        "html-entities": "^1.2.1",
         "jimp": "^0.6.0",
         "lodash": "^4.17.11",
         "moment": "^2.24.0",
@@ -27,8 +30,6 @@
         "sharp": "^0.21.3",
         "socket.io": "^2.2.0",
         "sqlite3": "^4.0.6",
-        "typescript": "^3.3.3333",
-        "unescape": "^1.0.1",
         "ytdl-core": "^0.29.1"
     },
     "devDependencies": {
@@ -43,6 +44,7 @@
         "chai": "^4.2.0",
         "mocha": "^6.0.1",
         "source-map-support": "^0.5.10",
-        "ts-node": "^8.0.2"
+        "ts-node": "^8.0.2",
+        "typescript": "^3.3.3333"
     }
 }

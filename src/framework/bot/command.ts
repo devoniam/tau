@@ -22,6 +22,15 @@ export abstract class Command {
                 this.arguments.push(new Argument(argument));
             });
         }
+
+        this.init();
+    }
+
+    /**
+     * Initializes the command.
+     */
+    protected init() : any {
+
     }
 
     /**

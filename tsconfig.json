@@ -10,7 +10,7 @@
         "noUnusedLocals": false,
         "forceConsistentCasingInFileNames": true,
         "sourceMap": true,
-        "watch": true,
+        "watch": false,
         "baseUrl": "./src/",
         "outDir": "./dist/",
         "types": [
