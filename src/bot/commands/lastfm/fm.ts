@@ -1,7 +1,6 @@
 import { Command, Input } from '@api';
 import * as request from 'request';
 import { Response } from 'request';
-const unescape = require('unescape');
 
 export class LastFm extends Command {
 
@@ -91,7 +90,7 @@ export class LastFm extends Command {
                         }
 
                         input.channel.send( {
-                            embed: 
+                            embed:
                             {
                                 color: 3447003,
                                 author: {

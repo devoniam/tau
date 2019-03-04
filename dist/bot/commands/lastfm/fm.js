@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const _api_1 = require("@api");
 const request = require("request");
-const unescape = require('unescape');
 class LastFm extends _api_1.Command {
     constructor() {
         super({
