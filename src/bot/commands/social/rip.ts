@@ -29,15 +29,15 @@ export class Rip extends Command {
         let textFont : string = Jimp.FONT_SANS_32_BLACK;
 
         let outputText : string = ':skull: F';
-        
+
         let image : Jimp = await Jimp.read(tombstoneImageUrl) as Jimp;
         let font = await Jimp.loadFont(textFont);
         this.AddTextToImage(image, font, fallen);
-        
+
         this.WriteSendAndDeleteImage(image, imageDirectory, input, outputText);
     }
 
-    private AddTextToImage(image: Jimp, font: Font, fallen: GuildMember) {
+    private AddTextToImage(image: Jimp, font: any, fallen: GuildMember) {
         image.print(font, 0, 0, {
             text: fallen.displayName,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
