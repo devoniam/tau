@@ -1,1 +1,0 @@
-{"version":3,"file":"poem.js","sourceRoot":"","sources":["../../../../src/bot/commands/random/poem.ts"],"names":[],"mappings":";;AAAA,+BAAsC;AAEtC,MAAa,IAAK,SAAQ,cAAO;IAC7B;QACI,KAAK,CAAC;YACF,IAAI,EAAE,MAAM;YACZ,WAAW,EAAE,wBAAwB;SACxC,CAAC,CAAC;IACP,CAAC;IAED,OAAO,CAAC,KAAY;QAChB,KAAK,CAAC,OAAO,CAAC,IAAI,CAAC,sBAAsB,CAAC,CAAC;IAC/C,CAAC;CACJ;AAXD,oBAWC"}
