@@ -79,6 +79,8 @@ Guild.prototype.load = (async function() {
         this.settings = new GuildBucket(this.id);
         await this.settings.load();
     }
+
+    await this.settings.wait();
 });
 
 GuildMember.prototype.load = (async function() {
@@ -87,6 +89,8 @@ GuildMember.prototype.load = (async function() {
         this.settings = new MemberBucket(this.id, this.guild.id);
         await this.settings.load();
     }
+
+    await this.settings.wait();
 });
 
 // Add typescript sourcemapping for stack traces
