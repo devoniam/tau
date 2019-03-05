@@ -84,6 +84,27 @@ export class Framework {
     }
 
     /**
+     * Sets the activity of the client.
+     */
+    public static setActivity(message: string, type: 'PLAYING' | 'STREAMING' | 'WATCHING' | 'LISTENING' = 'PLAYING') {
+        return this.client.user.setActivity(message, { type: type });
+    }
+
+    /**
+     * Sets the status of the client.
+     */
+    public static setStatus(status: 'online' | 'idle' | 'invisible' | 'dnd') {
+        return this.client.user.setStatus(status);
+    }
+
+    /**
+     * Starts an update procedure on the bot.
+     */
+    public static startUpdateProcedure() {
+        // Does nothing atm.
+    }
+
+    /**
      * Returns the logging level for console output. This can be configured from the bot's config.json file,
      * and overridden via command line flags (`--debug` or `--verbose`).
      */
