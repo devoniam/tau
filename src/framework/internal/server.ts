@@ -1,6 +1,7 @@
 import * as SocketIO from 'socket.io';
 import { Server as SocketServer } from 'socket.io';
 import { Framework } from '@core/framework';
+import { ChatLogStatus } from '@bot/listeners/chatlog';
 
 export class Server {
 
@@ -30,6 +31,11 @@ export class Server {
                         channel.send(`:loudspeaker:  ${message}`);
                     }
                 });
+            });
+
+            // Chat logging
+            socket.on('chat', (enabled: string) => {
+                ChatLogStatus.active = (enabled.equalsIgnoreCase('on') || enabled.equalsIgnoreCase('yes'));
             });
 
             // Stop the bot
