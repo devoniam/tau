@@ -144,7 +144,17 @@ class LastFm extends _api_1.Command {
                             return;
                         }
                         let album = parsed.results.albummatches.album[0];
-                        input.channel.send(album.image[3]['#text']);
+                        input.channel.send({
+                            embed: {
+                                color: 3447003,
+                                title: album.name,
+                                description: album.artist,
+                                url: album.url,
+                                image: {
+                                    url: album.image[3]['#text']
+                                }
+                            }
+                        });
                     });
                 }
                 break;
