@@ -58,7 +58,7 @@ export class Framework {
                 this.loadJobs();
                 this.listen();
 
-                this.logger.debug('Bot is online...');
+                this.logger.info('Bot is online...');
             });
         }
         else {
@@ -197,7 +197,7 @@ export class Framework {
      */
     private static loadCommands(inDirectory?: string) {
         if (inDirectory) {
-            this.logger.verbose('Scanning for commands:', inDirectory);
+            this.logger.verbose('Loading commands:', inDirectory);
 
             if (!fs.existsSync(inDirectory)) return;
             let files = this.getFilesSync(inDirectory);
@@ -206,7 +206,6 @@ export class Framework {
                 let fileName = filePath.substring(inDirectory.length + 1);
 
                 try {
-                    this.logger.verbose('Hit:', filePath);
                     let classes = require(filePath);
 
                     for (let className in classes) {
@@ -236,7 +235,7 @@ export class Framework {
      */
     private static loadListeners(inDirectory?: string) {
         if (inDirectory) {
-            this.logger.verbose('Scanning for listeners:', inDirectory);
+            this.logger.verbose('Loading listeners:', inDirectory);
 
             if (!fs.existsSync(inDirectory)) return;
             let files = this.getFilesSync(inDirectory);
@@ -245,7 +244,6 @@ export class Framework {
                 let fileName = filePath.substring(inDirectory.length + 1);
 
                 try {
-                    this.logger.verbose('Hit:', filePath);
                     let classes = require(filePath);
 
                     for (let className in classes) {
@@ -275,7 +273,7 @@ export class Framework {
      */
     private static loadScripts(inDirectory?: string) {
         if (inDirectory) {
-            this.logger.verbose('Scanning for scripts:', inDirectory);
+            this.logger.verbose('Loading scripts:', inDirectory);
 
             if (!fs.existsSync(inDirectory)) return;
             let files = this.getFilesSync(inDirectory);
@@ -284,7 +282,6 @@ export class Framework {
                 let fileName = filePath.substring(inDirectory.length + 1);
 
                 try {
-                    this.logger.verbose('Hit:', filePath);
                     require(filePath);
                 }
                 catch (error) {
@@ -302,7 +299,7 @@ export class Framework {
      */
     private static loadJobs(inDirectory?: string) {
         if (inDirectory) {
-            this.logger.verbose('Scanning for jobs:', inDirectory);
+            this.logger.verbose('Loading jobs:', inDirectory);
 
             if (!fs.existsSync(inDirectory)) return;
             let files = this.getFilesSync(inDirectory);
@@ -311,7 +308,6 @@ export class Framework {
                 let fileName = filePath.substring(inDirectory.length + 1);
 
                 try {
-                    this.logger.verbose('Hit:', filePath);
                     let classes = require(filePath);
 
                     for (let className in classes) {
