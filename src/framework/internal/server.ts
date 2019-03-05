@@ -36,6 +36,18 @@ export class Server {
             socket.on('stop', () => {
                 Framework.shutdown();
             });
+
+            // Start updating the bot
+            socket.on('update:start', () => {
+                Framework.startUpdateProcedure();
+                Framework.setStatus('dnd');
+                Framework.setActivity('Updating (0%)...');
+            });
+
+            // Set update progress
+            socket.on('update:progress', (percent: number) => {
+                Framework.setActivity(`Updating (${percent}%)...`);
+            });
         });
     }
 
