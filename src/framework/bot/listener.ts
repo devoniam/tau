@@ -72,12 +72,14 @@ export class Listener {
         client.on('guildUpdate', this.onGuildUpdate.bind(this));
 
         client.on('message', async (message: Message) => {
+            if (message.channel.type != 'text') return;
             await message.member.load();
             await message.guild.load();
             await this.run(this.onMessage(message));
         });
 
         client.on('messageDelete', async (message: Message) => {
+            if (message.channel.type != 'text') return;
             await message.member.load();
             await message.guild.load();
             await this.run(this.onMessageDelete(message));
