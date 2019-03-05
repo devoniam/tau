@@ -1,6 +1,7 @@
 import { Framework } from '@core/framework';
 import chalk from 'chalk';
 import * as readline from 'readline';
+import moment = require('moment');
 
 export class Logger {
     private id?: string;
@@ -49,6 +50,11 @@ export class Logger {
         let tagId = this.id ? `${chalk.gray(this.id)} ` : '';
         let tagLevel = this.color(level);
         let entry = `${tagId + tagLevel}`;
+
+        if (Framework.getEnvironment() == 'production') {
+            let time = moment().format('MM-DD-YYYY HH:mm:ssZZ');
+            entry = `[${time}] ` + entry;
+        }
 
         if (typeof message === 'string') {
             entry += (' ' + message);
