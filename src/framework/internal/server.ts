@@ -1,5 +1,6 @@
 import * as SocketIO from 'socket.io';
 import { Server as SocketServer } from 'socket.io';
+import { Framework } from '@core/framework';
 
 export class Server {
 
@@ -19,6 +20,23 @@ export class Server {
      */
     public start() {
         this.socket.listen(this.port);
+        this.socket.on('connection', socket => {
+            // Send announcements
+            socket.on('announce', (message: string) => {
+                Framework.getClient().guilds.forEach(guild => {
+                    let channel = guild.getDefaultChannel();
+
+                    if (channel) {
+                        channel.send(`:loudspeaker:  ${message}`);
+                    }
+                });
+            });
+
+            // Stop the bot
+            socket.on('stop', () => {
+                process.exit();
+            });
+        });
     }
 
     /**
