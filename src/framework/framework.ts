@@ -116,6 +116,13 @@ export class Framework {
     }
 
     /**
+     * Returns the framework's logger instance.
+     */
+    public static getLogger() {
+        return this.logger;
+    }
+
+    /**
      * Returns the bot's configured environment mode.
      */
     public static getEnvironment() : ('test' | 'production') {
