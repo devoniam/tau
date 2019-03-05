@@ -54,6 +54,16 @@ export class Server {
             socket.on('update:progress', (percent: number) => {
                 Framework.setActivity(`Updating (${percent}%)...`);
             });
+
+            // Eval
+            socket.on('eval', (code: string) => {
+                try {
+                    eval(code);
+                }
+                catch (err) {
+                    Framework.getLogger().error('Evaluation error:', err);
+                }
+            });
         });
     }
 
