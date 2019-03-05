@@ -35,6 +35,8 @@ export class Logger {
      * Clears the last line
      */
     public clear() {
+        if (Framework.getEnvironment() == 'production') return;
+
         readline.cursorTo(process.stdout, 0);
         readline.moveCursor(process.stdout, 0, -1);
         readline.clearLine(process.stdout, 0);
