@@ -34,7 +34,7 @@ export class Server {
 
             // Stop the bot
             socket.on('stop', () => {
-                process.exit();
+                Framework.shutdown();
             });
         });
     }

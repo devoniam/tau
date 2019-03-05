@@ -179,38 +179,45 @@ export class Framework {
         }
 
         process.on('SIGINT', async () => {
-            if (!CommandLine.hasFlag('dry')) {
-                this.logger.info('Stopping gracefully...');
-                this.logger.verbose('Waiting for client to sign off...');
-
-                // Stop the client
-                await this.client.destroy();
-
-                // Stop the server if it is active
-                if (this.server) {
-                    this.logger.verbose('Waiting for socket server to shut down...');
-                    await this.server.stop();
-                }
-
-                // Exit, code 0
-                this.logger.verbose('All done, sayonara!');
-                process.exit();
-            }
-            else {
-                // Stop the server if it is active
-                if (this.server) {
-                    this.logger.verbose('Waiting for socket server to shut down...');
-                    await this.server.stop();
-                }
-
-                // Stop the database
-                this.logger.verbose('Closing database...');
-                await Database.close();
-
-                // Exit, code 0
-                process.exit();
-            }
+            this.shutdown();
         });
+    }
+
+    /**
+     * Gracefully shuts down the bot.
+     */
+    public static async shutdown() {
+        if (!CommandLine.hasFlag('dry')) {
+            this.logger.info('Stopping gracefully...');
+            this.logger.verbose('Waiting for client to sign off...');
+
+            // Stop the client
+            await this.client.destroy();
+
+            // Stop the server if it is active
+            if (this.server) {
+                this.logger.verbose('Waiting for socket server to shut down...');
+                await this.server.stop();
+            }
+
+            // Exit, code 0
+            this.logger.verbose('All done, sayonara!');
+            process.exit();
+        }
+        else {
+            // Stop the server if it is active
+            if (this.server) {
+                this.logger.verbose('Waiting for socket server to shut down...');
+                await this.server.stop();
+            }
+
+            // Stop the database
+            this.logger.verbose('Closing database...');
+            await Database.close();
+
+            // Exit, code 0
+            process.exit();
+        }
     }
 
     /**
