@@ -1,4 +1,5 @@
 import { Command, Input } from '@api';
+import { Emoji } from '@bot/libraries/emoji';
 import * as request from 'request';
 import { Response } from 'request';
 
@@ -38,27 +39,15 @@ export class LastFm extends Command {
                 if (user && user != '') {
                     let requestURL = request((lastfmURL + 'user.getRecentTracks' + '&user=' + queryString), (error: any, response: Response, body: any) => {
                         if (error) {
-                            input.channel.send({
-                                embed: {
-                                    color: 3447003,
-                                    title: 'Connection Error',
-                                    description: "Unable to retrieve lastfm data"
-                                }
-                            });
+                            input.channel.send(`${Emoji.ERROR}  Connection error! Unable to retrieve lastfm data.`);
                         }
                         let nullText = '[undefined]';
                         let nullURL = 'https://discordapp.com/assets/ea3b7f0aee3f51c3bbfe5a6d7f93e436.svg'
 
                         let parsed = JSON.parse(body);
 
-                        if (!parsed.recenttracks) {
-                            input.channel.send({
-                                embed: {
-                                    color: 3447003,
-                                    title: 'Connection Error',
-                                    description: "Unable to retrieve lastfm data"
-                                }
-                            });
+                        if (parsed.recenttracks == undefined || parsed.recenttracks.track[0] == undefined) {
+                            input.channel.send(`${Emoji.ERROR}  Connection error! Unable to retrieve lastfm data.`);
                             return;
                         }
 
@@ -134,27 +123,15 @@ export class LastFm extends Command {
                 if (input.getArgument('user')) {
                     let requestURL = request((lastfmURL + 'album.search' + '&album=' + queryString), (error: any, response: Response, body: any) => {
                         if (error) {
-                            input.channel.send({
-                                embed: {
-                                    color: 3447003,
-                                    title: 'Connection Error',
-                                    description: "Unable to retrieve lastfm data"
-                                }
-                            });
+                            input.channel.send(`${Emoji.ERROR}  Connection error! Unable to retrieve lastfm data.`);
                         }
                         let nullText = '[undefined]';
                         let nullURL = 'https://discordapp.com/assets/ea3b7f0aee3f51c3bbfe5a6d7f93e436.svg'
 
                         let parsed = JSON.parse(body);
 
-                        if (!parsed.results) {
-                            input.channel.send({
-                                embed: {
-                                    color: 3447003,
-                                    title: 'Connection Error',
-                                    description: "Unable to retrieve lastfm data"
-                                }
-                            });
+                        if (parsed.results.albummatches == undefined) {
+                            input.channel.send(`${Emoji.ERROR}  Connection error! Unable to retrieve lastfm data.`);
                             return;
                         }
 
