@@ -11,7 +11,7 @@ declare global {
     /**
      * Returns an absolute path to the given file. The given file is a path relative to the bot's root directory.
      */
-    function root(path: string): string;
+    function rootpath(path: string): string;
 
     /**
      * Returns a promise which resolves after the specified number of milliseconds.

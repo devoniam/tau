@@ -14,7 +14,7 @@ global.tmp = function(p) {
     return path.join(__dirname, p);
 };
 
-global.root = function(p) {
+global.rootpath = function(p) {
     return path.join(__dirname, p);
 };
 
