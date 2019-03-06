@@ -9,7 +9,8 @@ declare global {
     function pub(path: string): string;
 
     /**
-     * Reads a public file and returns the contents as a string in the original encoding.
+     * Reads a public text file and returns its text in its original encoding. This will automatically remove
+     * lines that start with # (comments).
      *
      * **Warning:** This is a synchronous operation, meaning it will block the main thread of the framework
      * until it completes. Do not use this for large files (> 1 MB)

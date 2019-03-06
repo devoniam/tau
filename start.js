@@ -17,7 +17,12 @@ global.readPublicFile = function(p) {
         throw new Error('Public file does not exist: ' + p);
     }
 
-    return fs.readFileSync(filePath).toString();
+    let data = fs.readFileSync(filePath).toString();
+    let lines = data.split('\n');
+
+    return lines.filter(function (line) {
+        return line.indexOf('#') != 0;
+    }).join('\n').trim();
 };
 
 global.tmp = function(p) {
