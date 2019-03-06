@@ -1,6 +1,6 @@
 import { Command, Input } from '@api';
 
-const poems = readPublicFile('random/poems.txt').trim().split(/\r?\n\r?\n/);
+const poems = readPublicFile('random/poems.txt').split(/\r?\n\r?\n/);
 
 export class Poem extends Command {
     constructor() {
