@@ -14,6 +14,10 @@ global.tmp = function(p) {
     return path.join(__dirname, p);
 };
 
+global.root = function(p) {
+    return path.join(__dirname, p);
+};
+
 global.sleep = function(t) {
     return new Promise(resolve => {
         setTimeout(resolve, t);

@@ -9,9 +9,9 @@ declare global {
     function pub(path: string): string;
 
     /**
-     * Takes a relative path to a file in the `tmp` directory and returns the absolute path.
+     * Returns an absolute path to the given file. The given file is a path relative to the bot's root directory.
      */
-    function tmp(path: string): string;
+    function root(path: string): string;
 
     /**
      * Returns a promise which resolves after the specified number of milliseconds.
