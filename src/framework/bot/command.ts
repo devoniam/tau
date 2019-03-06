@@ -36,7 +36,7 @@ export abstract class Command {
     /**
      * Executes the command for the given input.
      */
-    public execute(input: Input): Promise<void> | void {
+    public execute(input: Input): any {
         input.channel.send('This command is not yet implemented.');
     }
 

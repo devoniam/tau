@@ -445,7 +445,7 @@ export class Framework {
 
                             // If the command returns a promise, catch errors from it
                             if (Promise.resolve(returned) == returned) {
-                                returned.catch(error => {
+                                returned.catch((error : Error) => {
                                     this.logger.error(`Encountered an error when running ${commandName} command:`);
                                     this.logger.error(error);
                                     input.channel.send(':tools:  Internal error, check console.');
