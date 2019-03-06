@@ -65,7 +65,7 @@ export class EightBall extends Command {
 
     async execute(input: Input) {
         // Randomise responses using an array
-        let response = responses[_.random(0, responses.length - 1)];
+        let response = _.sample(responses);
 
         // Send the response
         await input.channel.send(":8ball:  " + response);
