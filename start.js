@@ -91,6 +91,7 @@ GuildMember.prototype.load = (async function() {
     }
 
     await this.settings.wait();
+    await this.guild.load();
 });
 
 // Add typescript sourcemapping for stack traces
