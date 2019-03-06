@@ -10,7 +10,7 @@ export let Sections : HelpSections = {
     'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin', 'race' ],
     'Social': [ 'level', 'rank', 'leaderboard', 'mock', 'rip', 'quote' ],
     'Utilities': [ 'music', 'avatar', 'nicknames', 'fm' ],
-    'Random': [ 'between', 'csv', '8ball', 'noun', 'poem', 'pun', 'roll', 'trivia', 'user', 'verb', 'inspire' ]
+    'Random': [ 'between', 'csv', '8ball', 'poem', 'pun', 'roll', 'trivia', 'user', 'inspire', 'noun', 'verb', 'adjective', 'adverb' ]
 };
 
 export class Help extends Command {
