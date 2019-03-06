@@ -7,7 +7,7 @@ export let Sections : HelpSections = {
     'Basic': [ 'help', 'ping', 'uptime' ],
     'Admin': [ 'prefix', 'clear', 'spam' ],
     'Economy': [ 'balance', 'daily', 'pay', 'richest', 'inventory' ],
-    'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin' ],
+    'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin', 'race' ],
     'Social': [ 'level', 'rank', 'leaderboard', 'mock', 'rip', 'quote' ],
     'Utilities': [ 'music', 'avatar', 'nicknames', 'fm' ],
     'Random': [ 'between', 'csv', '8ball', 'noun', 'poem', 'pun', 'roll', 'trivia', 'user', 'verb', 'inspire' ]
