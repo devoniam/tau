@@ -10,6 +10,16 @@ global.pub = function(p) {
     return path.join(__dirname, 'public', p);
 };
 
+global.readPublicFile = function(p) {
+    let filePath = path.join(__dirname, 'public', p);
+
+    if (!fs.existsSync(filePath)) {
+        throw new Error('Public file does not exist: ' + p);
+    }
+
+    return fs.readFileSync(filePath).toString();
+};
+
 global.tmp = function(p) {
     return path.join(__dirname, p);
 };

@@ -9,6 +9,14 @@ declare global {
     function pub(path: string): string;
 
     /**
+     * Reads a public file and returns the contents as a string in the original encoding.
+     *
+     * **Warning:** This is a synchronous operation, meaning it will block the main thread of the framework
+     * until it completes. Do not use this for large files (> 1 MB)
+     */
+    function readPublicFile(path: string): string;
+
+    /**
      * Returns an absolute path to the given file. The given file is a path relative to the bot's root directory.
      */
     function rootpath(path: string): string;
