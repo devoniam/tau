@@ -5,8 +5,8 @@ import {Economy} from "@libraries/economy";
 export class Redeem extends Command {
     constructor() {
         super({
-            name: 'redeem',
-            aliases: ['daily'],
+            name: 'daily',
+            aliases: ['redeem'],
             description: 'Try your luck at a random amount of free daily currency and/or items.'
         });
     }
