@@ -30,7 +30,7 @@ export class CleverbotListener extends Listener
             message.channel.startTyping();
 
             cleverbot.getReply({
-                input: content
+                input: encodeURI(content)
             }, (error : Error, response : {input: string; output: string}) => {
                 if (error) {
                     this.getLogger().error('Error occurred when running cleverscript:');
