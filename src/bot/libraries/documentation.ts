@@ -1,4 +1,5 @@
 import { Command } from "@api";
+import { RichEmbed } from "discord.js";
 
 /**
  * This class is a helper library to generate help and usage information for commands.
@@ -22,15 +23,13 @@ export class Documentation {
         command.getArguments().forEach(arg => {
             let options = arg.getOptions();
 
-            result += `_  _**→**  \`${arg.getName()}\`` + (arg.getDescription() ? `  :  ${arg.getDescription()}` : '');
+            result += `•  \`${arg.getName()}\`` + (arg.getDescription() ? `  –  ${arg.getDescription()}` : '');
             result += '\n';
 
             if (options && options.length > 1) {
                 options.forEach((option : any) => {
-                    result += `_         _• \`${option}\`\n`;
+                    result += `    ‣  \`${option}\`\n`;
                 });
-
-                result += '\n';
             }
         });
 
@@ -61,12 +60,25 @@ export class Documentation {
     /**
      * Returns a string with the full detailed help information for a command.
      */
-    public static getCommandHelp(command: Command) {
-        let help = Documentation.getCommandOverview(command);
-        help += '\n\n';
-        help += Documentation.getArgumentDetails(command);
+    public static getCommandHelp(command: Command) : RichEmbed {
+        // Build the embed
+        let embed = new RichEmbed({
+            description: command.getDescription() + '\n',
+            color: 0x1c7ed6,
+            author: { name: 'Help for ' + command.getName() },
+            fields: [
+                {
+                    name: 'Usage',
+                    value: '`' + this.getInlineUsage(command) + '`'
+                },
+                {
+                    name: 'Arguments',
+                    value: Documentation.getArgumentDetails(command)
+                }
+            ]
+        });
 
-        return help;
+        return embed;
     }
 
 }

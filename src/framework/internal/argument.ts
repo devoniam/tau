@@ -131,7 +131,7 @@ export class Argument {
 
         if (this.getDefaultValue() != undefined) {
             let d = '' + this.getDefaultValue();
-            if (d == '@mention') d = 'you';
+            if (d == '@mention' || d == '@member') d = 'you';
             components.push(' = ' + d);
         }
 

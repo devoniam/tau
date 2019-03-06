@@ -1,7 +1,17 @@
 import { Command, Input } from '@api';
 import { Framework } from '@core/framework';
 import { Documentation } from '@bot/libraries/documentation';
-import { Util } from 'discord.js';
+import { Util, RichEmbed } from 'discord.js';
+
+export let Sections : HelpSections = {
+    'Basic': [ 'help', 'ping', 'uptime' ],
+    'Admin': [ 'prefix', 'clear', 'spam' ],
+    'Economy': [ 'balance', 'daily', 'pay', 'richest', 'inventory' ],
+    'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin' ],
+    'Social': [ 'level', 'rank', 'leaderboard', 'mock', 'rip', 'quote' ],
+    'Utilities': [ 'music', 'avatar', 'nicknames', 'fm' ],
+    'Random': [ 'between', 'csv', '8ball', 'noun', 'poem', 'pun', 'roll', 'trivia', 'user', 'verb', 'inspire' ]
+};
 
 export class Help extends Command {
     constructor() {
@@ -29,16 +39,33 @@ export class Help extends Command {
             return;
         }
 
-        let list = ':pencil:  **Commands:**\n\n';
-        let commands = Framework.getCommands();
+        // Build the fields
+        let fields : any[] = [];
 
-        commands.forEach(command => {
-            list += `_  _**→**  \`${command.getUsage()}\`  :  ${command.getDescription()}\n`;
+        _.each(Sections, (commands, title) => {
+            let o = '';
+
+            _.each(commands, name => {
+                o += '`' + name + '`  ';
+            });
+
+            fields.push({
+                name: title,
+                value: o.trimRight()
+            });
         });
 
-        let output = Util.splitMessage(list.trim());
-        for (let i = 0; i < output.length; i++) {
-            await input.channel.send(output[i]);
-        }
+        // Build the embed
+        let embed = new RichEmbed({
+            description: 'The prefix for this server is `' + input.guild.settings.prefix + '`.',
+            color: 0x1c7ed6,
+            footer: { text: 'For detailed information about a command, use !help command or !command help.' },
+            author: { name: 'Help' },
+            fields: fields
+        });
+
+        await input.channel.send(embed);
     }
 }
+
+type HelpSections = { [name: string]: string[] };
