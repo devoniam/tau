@@ -34,6 +34,10 @@ String.prototype.equals = (function(o) {
     return o == this;
 });
 
+String.prototype.capitalize = (function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+});
+
 // Add to message and guild prototypes
 
 const { Message, Guild, GuildMember } = require('discord.js');

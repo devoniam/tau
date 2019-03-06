@@ -21,5 +21,6 @@ declare global {
     interface String {
         equals(other: string) : boolean;
         equalsIgnoreCase(other: string) : boolean;
+        capitalize() : string;
     }
 }
