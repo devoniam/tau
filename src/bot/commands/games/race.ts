@@ -107,7 +107,7 @@ export class Race extends Command {
             this.performRace(race);
 
             await this.updateRaceMessage(message!, race);
-            await sleep(1000);
+            await sleep(1500);
 
             if (this.getNumberWinners(race) == race.members.length) break;
         }
@@ -292,7 +292,7 @@ export class Race extends Command {
             if (row.place) return;
 
             // Get the base speed of the animal
-            let speed = Animals[row.animal].speed;
+            let speed = Animals[row.animal].speed * 1.5;
 
             // Apply injuries
             if (row.injured > 0) {
