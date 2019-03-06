@@ -4,7 +4,7 @@ import { Documentation } from '@bot/libraries/documentation';
 import { Util, RichEmbed } from 'discord.js';
 
 export let Sections : HelpSections = {
-    'Basic': [ 'help', 'ping', 'uptime' ],
+    'Basic': [ 'help', 'ping', 'uptime', 'changelog' ],
     'Admin': [ 'prefix', 'clear', 'spam' ],
     'Economy': [ 'balance', 'daily', 'pay', 'richest', 'inventory' ],
     'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin', 'race' ],
