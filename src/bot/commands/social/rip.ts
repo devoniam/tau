@@ -27,28 +27,30 @@ export class Rip extends Command {
         //Unused for now
         let textColor : string = '0x666666ff';
         let textFont : string = Jimp.FONT_SANS_32_BLACK;
+        let subTextFont : string = Jimp.FONT_SANS_16_BLACK;
 
         let outputText : string = ':skull: F'
         let maximumAge = 100;
 
         let image : Jimp = await Jimp.read(tombstoneImageUrl) as Jimp;
         let font = await Jimp.loadFont(textFont);
+        let subFont = await Jimp.loadFont(subTextFont);
         let currentYear = new Date().getFullYear();
         let birthYear = /*lodash*/_.random(currentYear - maximumAge, currentYear);
-        
+
         //For whatever reason \n isn't recognized when using Jimp's print function.
-        let text = `${fallen.displayName}\n${birthYear} - ${currentYear}`;
-        this.AddTextToImage(image, font, text);
+        this.AddTextToImage(image, font, `${fallen.displayName}`, 32, -52);
+        this.AddTextToImage(image, subFont, `${birthYear} - ${currentYear}`, 16, -6);
 
         this.WriteSendAndDeleteImage(image, imageDirectory, input, outputText);
     }
 
-    private AddTextToImage(image: Jimp, font: any, fallen: string) {
-        image.print(font, 0, 0, {
+    private AddTextToImage(image: Jimp, font: any, fallen: string, height: number, offset: number) {
+        image.print(font, 0, (image.getHeight() / 2) + offset, {
             text: fallen,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
-            alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
-        }, image.getWidth(), image.getHeight());
+            alignmentY: Jimp.VERTICAL_ALIGN_TOP
+        }, image.getWidth(), height);
     }
 
     private ApplyTintToMessage(image: Jimp, tintColor: string, tintIntensity: number) {
