@@ -33,12 +33,12 @@ export class Rip extends Command {
         let font = await Jimp.loadFont(textFont);
         let subFont = await Jimp.loadFont(subTextFont);
         let currentYear = new Date().getFullYear();
-        let birthYear = input.member.settings.birthYear || _.random(currentYear - maximumAge, currentYear);
+        let birthYear = fallen.settings.birthYear || _.random(currentYear - maximumAge, currentYear);
 
         // Save the birth year persistently
-        if (!input.member.settings.birthYear) {
-            input.member.settings.birthYear = birthYear;
-            input.member.settings.save();
+        if (!fallen.settings.birthYear) {
+            fallen.settings.birthYear = birthYear;
+            fallen.settings.save();
         }
 
         //For whatever reason \n isn't recognized when using Jimp's print function.
