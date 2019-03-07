@@ -21,7 +21,6 @@ export class Rip extends Command {
     async execute(input: Input){
         let fallen = input.getArgument('user') as GuildMember;
 
-        let tombstoneImageUrl : string = 'https://us.123rf.com/450wm/kellyvandellen/kellyvandellen1712/kellyvandellen171200166/92196178-empty-marble-gravestone-in-historic-cemetery-in-southern-usa.jpg?ver=6';
         let imageDirectory : string = './tombstone.png';
 
         //Unused for now
@@ -32,11 +31,17 @@ export class Rip extends Command {
         let outputText : string = ':skull: F'
         let maximumAge = 100;
 
-        let image : Jimp = await Jimp.read(tombstoneImageUrl) as Jimp;
+        let image : Jimp = await Jimp.read(pub('images/gravestone.jpg')) as Jimp;
         let font = await Jimp.loadFont(textFont);
         let subFont = await Jimp.loadFont(subTextFont);
         let currentYear = new Date().getFullYear();
-        let birthYear = /*lodash*/_.random(currentYear - maximumAge, currentYear);
+        let birthYear = input.member.settings.birthYear || _.random(currentYear - maximumAge, currentYear);
+
+        // Save the birth year persistently
+        if (!input.member.settings.birthYear) {
+            input.member.settings.birthYear = birthYear;
+            input.member.settings.save();
+        }
 
         //For whatever reason \n isn't recognized when using Jimp's print function.
         this.AddTextToImage(image, font, `${fallen.displayName}`, 32, -52);
