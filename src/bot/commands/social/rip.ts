@@ -21,8 +21,6 @@ export class Rip extends Command {
     async execute(input: Input){
         let fallen = input.getArgument('user') as GuildMember;
 
-        let imageDirectory : string = './tombstone.png';
-
         //Unused for now
         let textColor : string = '0x666666ff';
         let textFont : string = Jimp.FONT_SANS_32_BLACK;
@@ -47,7 +45,10 @@ export class Rip extends Command {
         this.AddTextToImage(image, font, `${fallen.displayName}`, 32, -52);
         this.AddTextToImage(image, subFont, `${birthYear} - ${currentYear}`, 16, -6);
 
-        this.WriteSendAndDeleteImage(image, imageDirectory, input, outputText);
+        // Send the image
+        input.channel.send(outputText, {
+            files: [await image.getBufferAsync(Jimp.MIME_JPEG)]
+        });
     }
 
     private AddTextToImage(image: Jimp, font: any, fallen: string, height: number, offset: number) {
@@ -63,20 +64,5 @@ export class Rip extends Command {
             { apply: 'mix', params: [tintColor, tintIntensity] }
         ]);
         return image;
-    }
-
-    private WriteSendAndDeleteImage(image: Jimp, imageDirectory: string, input: Input, outputText: string) {
-        //Write to file.
-        image.writeAsync(imageDirectory).then(msg => {
-            //Then send the image in the chat with text
-            input.channel.send(outputText, {
-                files: [
-                    imageDirectory
-                ]
-            }).then(msg => {
-                //Then delete the file that was just written.
-                FS.unlinkSync(imageDirectory);
-            });
-        });
     }
 }
