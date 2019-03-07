@@ -461,7 +461,9 @@ export class Framework {
                     catch (error) {
                         this.logger.error(`Encountered an error when running ${commandName} command:`);
                         this.logger.error(error);
-                        input.channel.send(':tools:  Internal error, check console.');
+
+                        if (this.getEnvironment() == 'test') input.channel.send(':tools:  Internal error, check console.');
+                        else input.channel.send(':tools:  Sorry, I ran into an error.');
                     }
                 }
                 else {
