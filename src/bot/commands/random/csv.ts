@@ -8,20 +8,18 @@ export class CSV extends Command {
             description: 'Picks one or more random entries from the given comma-separated list.',
             arguments: [
                 {
+                    name: 'amount',
+                    description: 'Amount of entries to retrieve.',
+                    constraint: 'number',
+                    default: 1
+                },
+                {
                     name: 'list',
                     description: 'List of entries separated by commas.',
                     expand: true,
                     required: true,
                     eval: (input : string) => input.indexOf(',') > 0
-                },
-                {
-                    name: 'amount',
-                    description: 'Amount of entries to retrieve.',
-                    expand: true,
-                    required: false,
-                    default: 1
                 }
-
             ]
         });
     }
