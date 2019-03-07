@@ -22,8 +22,20 @@ export class Race extends Command {
     }
 
     async execute(input: Input) {
-        if (input.getArgument('join') == 'join') await this.join(input);
-        else await this.start(input);
+        if (input.getArgument('join') == 'join') {
+            await this.join(input);
+        }
+        else {
+            try {
+                await this.start(input);
+            }
+            catch (err) {
+                if (input.channel.id in this.races) {
+                    delete this.races[input.channel.id];
+                    await input.channel.send(`${Emoji.ERROR}  Race cancelled.`);
+                }
+            }
+        }
     }
 
     /**
