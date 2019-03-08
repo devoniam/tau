@@ -127,6 +127,7 @@ const Module = module.constructor.length > 1 ? module.constructor : BuiltinModul
 const Resolve = Module._resolveFilename;
 const Paths = require('./tsconfig.json')['compilerOptions']['paths'];
 const BaseUrl = path.resolve(__dirname, require('./tsconfig.json')['compilerOptions']['outDir']);
+const BaseUrlTmp = path.resolve(__dirname, 'dist-tmp');
 const ResolverCache = {};
 
 Module._resolveFilename = (filename, parentModule, isMain) => {
@@ -144,7 +145,7 @@ Module._resolveFilename = (filename, parentModule, isMain) => {
                 let relative = baseRegExp.exec(filename)[1];
 
                 if (relative === undefined) {
-                    let absolutePath = path.join(BaseUrl, Paths[base][0].replace('/*', ''));
+                    let absolutePath = path.join((fs.existsSync(BaseUrlTmp)) ? BaseUrlTmp : BaseUrl, Paths[base][0].replace('/*', ''));
                     if (!absolutePath.endsWith('.js')) absolutePath += '.js';
 
                     return Resolve.call(this, ResolverCache[filename] = absolutePath, parentModule, isMain);
@@ -154,7 +155,7 @@ Module._resolveFilename = (filename, parentModule, isMain) => {
 
                 for (let i = 0; i < resolverPaths.length; i++) {
                     let resolverPath = resolverPaths[i];
-                    let absolutePath = path.join(BaseUrl, resolverPath.replace('/*', relative));
+                    let absolutePath = path.join((fs.existsSync(BaseUrlTmp)) ? BaseUrlTmp : BaseUrl, resolverPath.replace('/*', relative));
 
                     if (!absolutePath.endsWith('.js')) absolutePath += '.js';
 
