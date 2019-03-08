@@ -1,5 +1,5 @@
 import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
-import { LobbyManager } from '@bot/libraries/gamelobby/lobby-manager';
+import { LobbyManager } from '@bot/libraries/games/lobby-manager';
 import { Logger } from '@core/bot/logger';
 
 export abstract class Lobby {

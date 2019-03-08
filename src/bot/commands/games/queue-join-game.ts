@@ -1,8 +1,8 @@
 import { Command, Input } from '@api';
 import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
-import { LobbyManager } from '@bot/libraries/gamelobby/lobby-manager'
-import { TTTLobby } from '@bot/libraries/tictactoe/ttt-lobby';
-import { Lobby } from '@bot/libraries/gamelobby/lobby';
+import { LobbyManager } from '@bot/libraries/games/lobby-manager'
+import { TTTLobby } from '@bot/libraries/games/tictactoe/ttt-lobby';
+import { Lobby } from '@bot/libraries/games/lobby';
 
 export module gameEnums{
     export enum GameTypeEnum {

@@ -1,5 +1,5 @@
 import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
-import { Lobby } from '@bot/libraries/gamelobby/lobby'
+import { Lobby } from '@bot/libraries/games/lobby'
 
 export class LobbyManager {
     private lobbies : Lobby[];

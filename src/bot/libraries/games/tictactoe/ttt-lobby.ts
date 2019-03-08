@@ -1,8 +1,8 @@
 import { Message, GuildMember, Guild, TextChannel, DMChannel, GroupDMChannel, Role } from 'discord.js';
-import { TTTBoard, boardEnums } from '@bot/libraries/tictactoe/ttt-board';
-import { LobbyManager } from '@bot/libraries/gamelobby/lobby-manager';
+import { TTTBoard, boardEnums } from '@bot/libraries/games/tictactoe/ttt-board';
+import { LobbyManager } from '@bot/libraries/games/lobby-manager';
 import { Logger } from '@core/bot/logger';
-import { Lobby } from '@bot/libraries/gamelobby/lobby';
+import { Lobby } from '@bot/libraries/games/lobby';
 const CenterX = 1;
 const CenterY = 1;
 
