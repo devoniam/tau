@@ -14,25 +14,16 @@ import { debug } from 'util';
 import { TextChannel } from 'discord.js';
 const entities = require("html-entities").AllHtmlEntities;
 
-//TODO: Line 468 and 472 convert from member.id to member.displayname
-//TODO: Trivia should be multiplayer, but work fine for single player
-//TODO: End game if inactive for certain amount of time
-//along with the trivia question thats displayed. The players click the reaction they think is the answer
 //TODO: Make the trivia questions run on a loop that waits for player(s) to answer.
-//TODO: Once player(s) have submitted, the bot displays the correct answer and gives points to the plyer(s) that got it right
 //TODO: Add Stop command for admins
 //TODO: Better Error handling
 
-//------------------[Maybe]-------------------- 
-//TODO: Add Trivia join command. 
+//---------[Require Framework Support]---------
+//TODO: Display amount of questions in each category
+
+//------------------[Maybe]--------------------
+//TODO: Add Trivia join command.
 //TODO: Add Amount command
-
-//--------[Requires Framework Support]---------
-//DONE: Display amount of questions for each category
-
-//--------------------[Done]---------------------
-//DONE: Add reacts a,b,c,d to the displayed trivia
-//DONE: Integrate reaction collector
 
 const triviaCategories: string[] = [
     'All',
@@ -120,13 +111,13 @@ export class Trivia extends Command {
     //         //let c = await parseResponse('https://opentdb.com/api_count.php?category=' + (i + 8).toString() );
     //     }
     // }
-    
+
     async execute(input: Input) {
-        
+
         let category = input.getArgument('category');
         let difficulty = input.getArgument('difficulty');
         let type = input.getArgument('type');
-        
+
         //Translate user input into URLS for the database
         let difficultyURL: string = '&difficulty=' + difficulty;
         let typeURL: string = '&type=' + type;
@@ -134,7 +125,10 @@ export class Trivia extends Command {
         let questionAmount = '?amount=10';
         let openTDB = 'https://opentdb.com/api.php';
         let choiceEmoji = ['🇦', '🇧', '🇨', '🇩'];
-        
+
+        //Amount of time to answer the question in seconds
+        let startTime = 15;
+
         //Set the URLs to default any if no arguments are entered
         if (!difficulty || difficulty == 'any' || difficulty == 'all') { difficultyURL = ''; }
         if (!type || type == 'any' || type == 'all') { typeURL = ''; }
@@ -154,7 +148,7 @@ export class Trivia extends Command {
         //do {
 
         //Fix any encoding errors using entities.decode()
-        //Normalize the names for the parsed TriviaResponse data 
+        //Normalize the names for the parsed TriviaResponse data
         let question = entities.decode(parsed.results[count].question);
         let incorrect_answers: string[] = [];
         let correct_answer = entities.decode(parsed.results[count].correct_answer);
@@ -162,21 +156,9 @@ export class Trivia extends Command {
         _.each(parsed.results[count].incorrect_answers, s => incorrect_answers.push(entities.decode(s)));
         incorrect_answers.forEach(element => { answers.push(element); });
 
-
-        // console.log(`Question: ${question}`);
-        // console.log(`dQuestion: ${entities.decode(question)}`);
-        // console.log(`CorrectAnswer: ${correct_answer}`);
-        // console.log(`IncorrectAnswers: ${incorrect_answers}`);
-        // console.log(`Category: ${parsed.results[count].category}`);
-
         //Randomize answers before displaying
         if (answers.length > 2) {
-            for (let i = answers.length - 1; i > 0; i--) {
-                let e = Math.floor(Math.random() * (i + 1));
-                let temp = answers[i];
-                answers[i] = answers[e];
-                answers[e] = temp;
-            }
+            _.shuffle(answers);
         }
         //Make A) say true every time
         else {
@@ -189,7 +171,7 @@ export class Trivia extends Command {
                 answers[1] = correct_answer;
             }
         }
-        
+
         let answersDictonary = {
             '🇦': answers[0],
             '🇧': answers[1],
@@ -206,14 +188,14 @@ export class Trivia extends Command {
 
         let message: Message;
         let multipleChoice = parsed.results[count].type == 'multiple';
-
+        let questionDifficulty = parsed.results[count].difficulty.capitalize();
         //Display the correct message depending on the answer type
         if (multipleChoice) {
             message = await input.channel.send({
                 embed:
                 {
                     color: 0xfab005,
-                    title: '__' + parsed.results[count].category + '__',
+                    title: `__${parsed.results[count].category}__  󠀀󠀀 󠀀󠀀󠀀󠀀· 󠀀󠀀 ${questionDifficulty}`,
                     description: question,
                     fields: [{
                         name: 'A)',
@@ -239,7 +221,7 @@ export class Trivia extends Command {
                 embed:
                 {
                     color: 0xfab005,
-                    title: '__' + parsed.results[count].category + '__',
+                    title: `__${parsed.results[count].category}__  󠀀󠀀 󠀀󠀀󠀀󠀀· 󠀀󠀀 ${questionDifficulty}`,
                     description: question,
                     fields: [{
                         name: 'A)',
@@ -272,14 +254,14 @@ export class Trivia extends Command {
             }
         }
         else {
-            for (let i = 0; i < choiceEmoji.length/2; i++){
+            for (let i = 0; i < 2; i++){
                 await message.react(choiceEmoji[i]);
             }
         }
 
-        // Countdown (20 sec)
-        let countdownMessage = await input.channel.send(`${Emoji.LOADING}  15 seconds left...`) as Message;
-        let timer = new Timer(15, async function (remaining) {
+        // Countdown (15 sec)
+        let countdownMessage = await input.channel.send(`${Emoji.LOADING}  ${startTime} seconds left...`) as Message;
+        let timer = new Timer(startTime, async function (remaining) {
             await countdownMessage.edit(`${Emoji.LOADING}  ${remaining} seconds left...`);
         });
         timer.run();
@@ -302,20 +284,24 @@ export class Trivia extends Command {
             if (wasCorrect){
                 correct.push(member);
                 correctNames.push(member.displayName);
-            } 
+            }
             else{
                 incorrect.push(member);
                 incorrectNames.push(member.displayName);
-            } 
+            }
         });
-        
-        //If no one answers delete the question
+
+        //If no one answers delete the question delete it
         if (_.size(reactionAnswers) == 0) {
             countdownMessage.edit(`${Emoji.LOADING} No answers chosen, shutting down...`);
             message.deleteAfter(2000);
             countdownMessage.delete();
         }
         else {
+
+            let difficulty = parsed.results[count].difficulty;
+            let amount = (difficulty.equals('easy') ? 5 : (difficulty.equals('medium') ? 10 : 20));
+
             // Load settings for all members
             for (let i = 0; i < correct.length; i++) await correct[i].load();
             for (let i = 0; i < incorrect.length; i++) await incorrect[i].load();
@@ -341,7 +327,7 @@ export class Trivia extends Command {
             // Award currency
             // Awaiting because it will send a message
             for (let i = 0; i < correct.length; i++) {
-                await Economy.addBalance(correct[i], 5, input.channel as TextChannel);
+                await Economy.addBalance(correct[i], amount, input.channel as TextChannel);
             }
         }
     }
