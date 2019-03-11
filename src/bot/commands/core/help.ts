@@ -4,13 +4,13 @@ import { Documentation } from '@bot/libraries/documentation';
 import { Util, RichEmbed } from 'discord.js';
 
 export let Sections : HelpSections = {
-    'Basic': [ 'help', 'ping', 'uptime', 'changelog' ],
+    'Basic': [ 'help', 'ping', 'uptime', 'changelog', 'invite' ],
     'Admin': [ 'prefix', 'clear', 'spam' ],
     'Economy': [ 'balance', 'daily', 'pay', 'richest', 'inventory' ],
-    'Games': [ 'breakice', 'madlib', 'tictactoe', 'spin', 'race' ],
-    'Social': [ 'level', 'rank', 'leaderboard', 'mock', 'rip', 'quote' ],
-    'Utilities': [ 'music', 'avatar', 'nicknames', 'fm' ],
-    'Random': [ 'between', 'csv', '8ball', 'poem', 'pun', 'roll', 'trivia', 'user', 'inspire', 'noun', 'verb', 'adjective', 'adverb' ]
+    'Games': [ 'game', 'madlib', 'spin', 'race' ],
+    'Social': [ 'level', 'rank', 'leaderboard', 'mock', 'rip', 'quote', 'breakice' ],
+    'Utilities': [ 'music', 'weather', 'poll', 'avatar', 'nicknames', 'lastfm', 'flip', 'countdown' ],
+    'Random': [ 'between', 'csv', '8ball', 'poem', 'pun', 'roll', 'trivia', 'user', 'inspire', 'noun', 'verb', 'adjective', 'adverb', 'twister', 'coinflip', 'fortune' ]
 };
 
 export class Help extends Command {
