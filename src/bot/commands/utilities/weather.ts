@@ -14,7 +14,8 @@ export class Weather extends Command {
                 {
                     name: 'location',
                     description: 'The name of a city to search for.',
-                    expand: true
+                    expand: true,
+                    required: true
                 }
             ]
         });
