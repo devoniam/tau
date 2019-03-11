@@ -44,8 +44,16 @@ export class Help extends Command {
 
         _.each(Sections, (commands, title) => {
             let o = '';
+            let sorted = commands.sort((a, b) => {
+                let nameA = a.toLowerCase();
+                let nameB = b.toLowerCase();
 
-            _.each(commands, name => {
+                if (nameA < nameB) return -1;
+                if (nameA > nameB) return 1;
+                return 0;
+            });
+
+            _.each(sorted, name => {
                 o += '`' + name + '`  ';
             });
 
