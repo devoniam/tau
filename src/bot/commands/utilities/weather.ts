@@ -62,6 +62,9 @@ export class Weather extends Command {
             // Delete the loading message
             try { await message.delete(); } catch(err) {};
 
+            let deg = parsed.wind.deg ? (' @ ' + parsed.wind.deg.toFixed(0) + '°') : '';
+            let wind = `${Math.floor(parsed.wind.speed + 0.5)} mph ${deg}`;
+
             // Finally, send the weather!
             await input.channel.send(new RichEmbed({
                 title: `Weather for ${parsed.name}`,
@@ -80,7 +83,7 @@ export class Weather extends Command {
                     },
                     {
                         name: 'Wind',
-                        value: `${Math.floor(parsed.wind.speed + 0.5)} mph @ ${parsed.wind.deg.toFixed(0)}°`,
+                        value: wind,
                         inline: true
                     }
                 ]
