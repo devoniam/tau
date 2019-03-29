@@ -81,8 +81,8 @@ export class Match extends Command {
 
                 console.log('sorted:', prices)
 
-                let nextLowestPrice = prices[0];
-                console.log('next lowest:', nextLowestPrice)
+                let lowestPrice = prices[prices.length-1];
+                console.log('lowest:', lowestPrice)
             });
 
         });
