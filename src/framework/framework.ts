@@ -132,6 +132,7 @@ export class Framework {
      * Returns the bot's configured environment mode.
      */
     public static getEnvironment() : ('test' | 'production') {
+        if (!this.config) return 'test';
         return this.config.environment;
     }
 
