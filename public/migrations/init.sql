@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS `members` (
   `name_history` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `lastfm_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birth_year` smallint(6) DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`,`guild_id`),
+  KEY `id` (`id`),
   KEY `guild_id` (`guild_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
