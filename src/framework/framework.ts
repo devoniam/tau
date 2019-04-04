@@ -19,9 +19,12 @@ import { Database } from './lib/database';
 import chalk from 'chalk';
 import { Documentation } from '@bot/libraries/documentation';
 import { Filesystem } from './internal/filesystem';
+import { SqliteMigration } from './lib/migrations/SqliteMigration';
 
 export class Framework {
     private static config: BotConfiguration;
+    private static interface: readline.Interface;
+
     private static client: Client;
     private static logger: Logger;
     private static server?: Server;
@@ -32,13 +35,16 @@ export class Framework {
     /**
      * Starts the bot.
      */
-    private static start() {
+    private static async start() {
         this.logger = new Logger();
 
         // Bootstrap
         this.loadConfiguration();
         this.startServer();
         this.bindGracefulShutdown();
+
+        // Connect to the database
+        await this.startDatabase();
 
         if (!CommandLine.hasFlag('dry')) {
             // Start the client
@@ -161,10 +167,52 @@ export class Framework {
                 environment: 'test',
                 options: { allowCodeExecution: false, loggingLevel: 'normal' },
                 server: { enabled: true, port: 3121 },
-                authentication: { discord: { token: '' }, cleverbot: { key: '' }, openWeatherMap: { key: '' }}
+                authentication: { discord: { token: '' }, cleverbot: { key: '' }, openWeatherMap: { key: '' }},
+                database: { host: 'localhost', port: 3306, name: 'ember', username: 'root', password: '' }
             } as BotConfiguration, null, 4));
 
             return welcome();
+        }
+    }
+
+    /**
+     * Starts the database.
+     */
+    private static async startDatabase() {
+        if (!this.config.database) {
+            let migration = new SqliteMigration();
+            let database = await migration.run();
+        }
+
+        let host = this.config.database.host;
+        let port = this.config.database.port;
+
+        this.logger.verbose(`Connecting to database at ${host}:${port}...`);
+        await Database.connect();
+        this.logger.verbose(`Connected successfully.`);
+
+        // Check to make sure the database is up to date
+        let version = await Database.getSchemaVersion();
+
+        // Run initial setup if version is undefined
+        if (!version) {
+            this.logger.info(`Setting up the database for the first time...`);
+
+            // Run the initial migration queries
+            let queries = readPublicFile('migrations/init.sql');
+            await Database.run(queries);
+
+            // Recheck the version
+            this.logger.info(`Checking the schema version...`);
+            version = await Database.getSchemaVersion();
+
+            if (!version) {
+                this.logger.error('Failed to run the initial migration queries.');
+                process.exit();
+            }
+            else {
+                this.logger.info(`Database migrated to version v${version} successfully.`);
+            }
         }
     }
 
@@ -181,13 +229,13 @@ export class Framework {
      * Binds to CTRL+C on Windows and Linux in order to implement a graceful shutdown.
      */
     private static bindGracefulShutdown() {
-        if (process.platform === 'win32') {
-            let rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout
-            });
+        this.interface = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
 
-            rl.on('SIGINT', () => {
+        if (process.platform === 'win32') {
+            this.interface.on('SIGINT', () => {
                 process.emit('SIGINT' as any);
             });
         }
@@ -206,7 +254,11 @@ export class Framework {
             this.logger.verbose('Waiting for client to sign off...');
 
             // Stop the client
-            await this.client.destroy();
+            if (this.client) await this.client.destroy();
+
+            // Stop the database
+            this.logger.verbose('Closing database...');
+            await Database.close();
 
             // Stop the server if it is active
             if (this.server) {
@@ -581,6 +633,13 @@ export class Framework {
             this.getLogger().warning(e);
         }
     }
+
+    /**
+     * Returns the readline interface for the bot.
+     */
+    public static getInterface() {
+        return this.interface;
+    }
 }
 
 type BotConfiguration = {
@@ -592,7 +651,7 @@ type BotConfiguration = {
     server: {
         enabled: boolean;
         port?: number;
-    }
+    };
     authentication: {
         discord: {
             token: string
@@ -603,5 +662,12 @@ type BotConfiguration = {
         openWeatherMap: {
             key: string;
         };
-    }
+    };
+    database: {
+        host: string;
+        port: number;
+        name: string;
+        username: string;
+        password: string;
+    };
 };
