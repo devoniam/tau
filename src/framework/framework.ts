@@ -632,7 +632,9 @@ export class Framework {
      * Reloads a given command or listener entry.
      */
     private static reloadEntry(entry: any) {
-        let type = (entry instanceof Command) ? 'command' : 'listener';
+        let type = (entry.instance instanceof Command) ?
+            'command' :
+            ((entry.instance instanceof Listener) ? 'listener' : 'other');
 
         // Warn if the command file no longer exists
         if (!fs.existsSync(entry.filePath)) {
@@ -651,8 +653,20 @@ export class Framework {
                 return;
             }
 
+            // Stop the existing instance if applicable
+            if (typeof entry.instance.stop === 'function') {
+                entry.instance.stop();
+            }
+
             // Set the new instance
             entry.instance = new object();
+
+            // Start the instance if it is a listener
+            if (type == 'listener') {
+                if (typeof entry.instance.start === 'function') {
+                    entry.instance.start();
+                }
+            }
         }
         catch (e) {
             this.getLogger().warning(`Encountered an error when reloading ${type} "${entry.className}"`);
