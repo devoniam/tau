@@ -42,7 +42,7 @@ export class Match extends Command {
                 let $$ = cheerio.load(body2);
                 let link = $$('.s-result-list .a-link-normal').first().attr('href');
 
-                input.channel.send(amazon + link);
+                input.channel.send(amazon + link); 
 
                 // console.log(amazon_search); 
                 
@@ -77,7 +77,7 @@ export class Match extends Command {
                 // Find next lowest
                 prices = prices.sort((a, b) => {
                     return b - a;
-                });
+                }); 
 
                 console.log('sorted:', prices)
 
