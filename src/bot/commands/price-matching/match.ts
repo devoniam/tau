@@ -2,6 +2,9 @@ import { Command, Input } from '@api';
 import * as request from 'request';
 import * as cheerio from 'cheerio';
 import { RichEmbed } from 'discord.js';
+import { link } from 'fs';
+const { BitlyClient } = require('bitly');
+const bitly = new BitlyClient('5faae4d3fcd09a8b4c368d4d34f8437c69843c05', {});
 
 export class Match extends Command {
     constructor() {
@@ -52,12 +55,15 @@ export class Match extends Command {
                 let matches : Listing[] = [];
 
                 // Iterate through each row
-                rows.each((i, row) => {
+                rows.each(async (i, row) => {
                     // Get the first <h5> in the row
                     let h5 = $$(row).find('h5').first();
-
                     // Get the first class="a-price-whole" in the row (has price)
                     let whole = $$(row).find('.a-price-whole').first();
+                    // Get the first href of <a> in h5
+                    let url = h5.find('a').first().attr('href');
+                    //Get first src in img id
+                    let img = $$(row).find('#landingImage').first().attr('src');
 
                     // If h5 or price is missing, skip
                     if (h5.length == 0) return;
@@ -66,18 +72,21 @@ export class Match extends Command {
                     // Extract text from each
                     let title = h5.text().trim();
                     let price_whole = parseInt(whole.text().trim().replace('.', ''));
-                    let link = ''; // get link to row item here
-                    
+                    let link = (amazon+url);
+        
+                    //let link = await bitly.shorten(amazon + url); // get link to row item here
+                    //console.log(link);
+
                     // Place matches into an array
                     if (price_whole < item_price) {
                         matches.push({
                             name: title,
                             site: 'amazon',
                             price: price_whole,
-                            url: link
+                            url: link,
+                            img_url: img
                         });
                     }
-
                     console.log(title, '$' + price_whole);
                 });
 
@@ -97,12 +106,14 @@ export class Match extends Command {
 
                     input.channel.send(new RichEmbed({
                         author: {
-                            name: 'Amazon'
+                            name: '**Amazon**',
+                            url: nextLowest.url,
+                            icon_url : nextLowest.img_url,
                         },
                         fields: [
                             {
                                 name: nextLowest.name,
-                                value: `$${nextLowest.price}`
+                                value: `$${nextLowest.price}`,
                             }
                         ]
                     }));
@@ -201,7 +212,8 @@ matches.push({
     name: 'djhsdg',
     site: 'ebay',
     price: 15,
-    url: 'https://ebay.com/asfjhafj'
+    url: 'https://ebay.com/asfjhafj',
+    img_url: ''
 });
 }
 
@@ -212,4 +224,5 @@ type Listing = {
     name: string;
     site: 'amazon' | 'ebay' | 'newegg';
     url: string;
+    img_url: string;
 };
